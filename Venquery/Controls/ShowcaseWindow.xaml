@@ -1,0 +1,49 @@
+<Window x:Class="Venquery.Controls.ShowcaseWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Showcase" WindowStyle="None" ResizeMode="NoResize" WindowState="Maximized"
+        WindowStartupLocation="CenterScreen" UseLayoutRounding="True"
+        Background="{DynamicResource Mica}" Foreground="{DynamicResource Text}">
+    <Grid x:Name="Root">
+        <!-- Bottom layer: the showcase's own background image, blended into the theme colour by its opacity. -->
+        <Image x:Name="BgImage" Stretch="UniformToFill" IsHitTestVisible="False" Visibility="Collapsed"
+               RenderOptions.BitmapScalingMode="HighQuality"/>
+
+        <!-- The chosen preset is built into here (centered). -->
+        <Grid x:Name="ContentHost"/>
+
+        <!-- Auto-hiding control strip. Hidden after a few seconds of no mouse movement so it stays out of a photo. -->
+        <Border x:Name="ControlBar" VerticalAlignment="Top" Background="{DynamicResource Frame}"
+                BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="14,9">
+            <DockPanel LastChildFill="False">
+                <TextBlock Text="Layout" VerticalAlignment="Center" Margin="0,0,10,0"
+                           Foreground="{DynamicResource Muted}" FontSize="12.5"/>
+                <Button x:Name="PresetHeroBtn" Content="Hero" Style="{StaticResource ChromeButton}"
+                        Margin="0,0,6,0" Click="OnPickPreset" Tag="hero"/>
+                <Button x:Name="PresetSheetBtn" Content="Spec sheet" Style="{StaticResource ChromeButton}"
+                        Margin="0,0,6,0" Click="OnPickPreset" Tag="sheet"/>
+                <Button x:Name="PresetPosterBtn" Content="Poster" Style="{StaticResource ChromeButton}"
+                        Margin="0,0,6,0" Click="OnPickPreset" Tag="poster"/>
+                <Button x:Name="PresetTilesBtn" Content="Tiles" Style="{StaticResource ChromeButton}"
+                        Margin="0,0,16,0" Click="OnPickPreset" Tag="tiles"/>
+
+                <CheckBox x:Name="DetailsToggle" Style="{StaticResource PillCheck}" Content="Show details"
+                          VerticalAlignment="Center" Margin="0,0,16,0" Click="OnToggleDetails"/>
+
+                <TextBlock Text="Background" VerticalAlignment="Center" Margin="0,0,10,0"
+                           Foreground="{DynamicResource Muted}" FontSize="12.5"/>
+                <Button x:Name="ChooseBgBtn" Content="Choose" Style="{StaticResource ChromeButton}"
+                        Margin="0,0,6,0" Click="OnChooseBg"/>
+                <Button x:Name="ClearBgBtn" Content="Clear" Style="{StaticResource ChromeButton}"
+                        Margin="0,0,10,0" Click="OnClearBg"/>
+                <Slider x:Name="OpacitySlider" Width="110" Minimum="0.1" Maximum="0.9" TickFrequency="0.05"
+                        IsSnapToTickEnabled="True" VerticalAlignment="Center" ValueChanged="OnOpacityChanged"/>
+                <TextBlock x:Name="OpacityText" VerticalAlignment="Center" Margin="8,0,0,0"
+                           Foreground="{DynamicResource Muted}" FontSize="12.5" Width="42"/>
+
+                <TextBlock DockPanel.Dock="Right" Text="Esc to exit" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Dim}" FontSize="12.5"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

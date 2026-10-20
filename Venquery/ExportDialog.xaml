@@ -1,0 +1,182 @@
+<Window x:Class="Venquery.ExportDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Export report" Width="470" Height="560" MinWidth="440" MinHeight="430"
+        ResizeMode="CanResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource Mica}" Foreground="{DynamicResource Text}"
+        FontFamily="Segoe UI Variable Display, Segoe UI Variable, Segoe UI">
+    <!-- 3 regions: fixed header, scrolling body, pinned footer. The footer (Cancel/Export) is always on
+         screen no matter how tall the content or how small the display; the body scrolls; the window
+         resizes both ways and OnSourceInitialized caps the height to the work area. -->
+    <DockPanel LastChildFill="True">
+
+        <StackPanel DockPanel.Dock="Top" Margin="22,16,22,10">
+            <TextBlock Text="Export report" FontSize="16" FontWeight="SemiBold"/>
+            <TextBlock Foreground="{DynamicResource Muted}" TextWrapping="Wrap" FontSize="12" Margin="0,5,0,0"
+                       Text="Files into a SystemReports folder (next to Venquery, or Downloads), organised by PC model and date."/>
+        </StackPanel>
+
+        <Border DockPanel.Dock="Bottom" Background="{DynamicResource Frame}"
+                BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="22,12,22,13">
+                <Button Content="Cancel" Style="{StaticResource ChromeButton}" Padding="16,8" Click="OnCancel" Margin="0,0,10,0"/>
+                <Button Content="Export…" Style="{StaticResource AccentButton}" Padding="18,8" Click="OnExport" IsDefault="True"/>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="22,4,18,12">
+            <StackPanel>
+
+                <!-- Crash & stability -->
+                <Border Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1"
+                        CornerRadius="8" Padding="12,10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox x:Name="IncludeStabilityCheck" Style="{StaticResource FluentCheck}"
+                                      IsChecked="True" VerticalAlignment="Center"/>
+                            <TextBlock Text="Include crash &amp; stability history"
+                                       VerticalAlignment="Center" Margin="10,0,0,0" FontSize="13" FontWeight="SemiBold"
+                                       MouseLeftButtonUp="OnToggleStability" Cursor="Hand"/>
+                        </StackPanel>
+                        <TextBlock Foreground="{DynamicResource Muted}" TextWrapping="Wrap" FontSize="11.5" Margin="30,6,0,0"
+                                   Text="From Windows' own event logs and Reliability Monitor, read-only. Can contain file paths / your username, so review before sharing."/>
+
+                        <StackPanel Margin="30,10,0,0" IsEnabled="{Binding IsChecked, ElementName=IncludeStabilityCheck}">
+                            <TextBlock Text="WHAT TO INCLUDE" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Dim}" Margin="0,0,0,6"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <CheckBox x:Name="GrpCrash" Style="{StaticResource FluentCheck}" IsChecked="True" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Crashes &amp; blue screens" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="12.5"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <CheckBox x:Name="GrpHardware" Style="{StaticResource FluentCheck}" IsChecked="True" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Hardware &amp; firmware" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="12.5"
+                                                   ToolTip="WHEA hardware faults, ACPI/BIOS/EC firmware errors, HAL, CPU firmware/thermal throttling"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox x:Name="GrpDevice" Style="{StaticResource FluentCheck}" IsChecked="True" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Drivers &amp; devices" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="12.5"
+                                                   ToolTip="Driver/device load failures (PnP), USB errors, service/driver crashes"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <CheckBox x:Name="GrpFreeze" Style="{StaticResource FluentCheck}" IsChecked="True" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Freezes &amp; hangs" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="12.5"
+                                                   ToolTip="GPU timeouts (TDR) and storage I/O timeouts, the usual causes of brief stalls"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <CheckBox x:Name="GrpStorage" Style="{StaticResource FluentCheck}" IsChecked="True" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Storage &amp; disk" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="12.5"
+                                                   ToolTip="Disk read/write errors and NTFS filesystem corruption"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox x:Name="GrpApp" Style="{StaticResource FluentCheck}" IsChecked="True" VerticalAlignment="Center"/>
+                                        <TextBlock Text="App crashes &amp; hangs" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="12.5"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <CheckBox x:Name="GrpReliability" Style="{StaticResource FluentCheck}" IsChecked="False" VerticalAlignment="Center"/>
+                                <TextBlock Text="Reliability Monitor history (optional)" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="12.5"
+                                           ToolTip="Windows' plain-English 'X stopped working / responding' history. Thorough but long, off by default."/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                <CheckBox x:Name="VerboseCheck" Style="{StaticResource FluentCheck}" IsChecked="False" VerticalAlignment="Center"/>
+                                <TextBlock Text="Full descriptions (don't shorten event text)" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="12.5"/>
+                            </StackPanel>
+
+                            <TextBlock Text="LOOK BACK" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Dim}" Margin="0,12,0,5"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Background="{DynamicResource Ctl}" BorderBrush="{DynamicResource CtlBd}" BorderThickness="1"
+                                        CornerRadius="5" Padding="9,5" Margin="0,0,8,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBox x:Name="DaysBox" Text="30" Width="42" BorderThickness="0" Background="Transparent"
+                                                 Foreground="{DynamicResource Text}" CaretBrush="{DynamicResource Text}"
+                                                 FontFamily="Cascadia Code, Consolas" FontSize="13" TextAlignment="Center"
+                                                 MaxLength="4" PreviewTextInput="OnDaysInput"/>
+                                        <TextBlock Text="days" Foreground="{DynamicResource Muted}" FontSize="12.5" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <Button Content="30" Style="{StaticResource LinkButton}" Click="OnPreset" VerticalAlignment="Center" Margin="4,0"/>
+                                <TextBlock Text="·" Foreground="{DynamicResource Dim}" VerticalAlignment="Center"/>
+                                <Button Content="90" Style="{StaticResource LinkButton}" Click="OnPreset" VerticalAlignment="Center" Margin="4,0"/>
+                                <TextBlock Text="·" Foreground="{DynamicResource Dim}" VerticalAlignment="Center"/>
+                                <Button Content="180" Style="{StaticResource LinkButton}" Click="OnPreset" VerticalAlignment="Center" Margin="4,0"/>
+                                <TextBlock Text="·" Foreground="{DynamicResource Dim}" VerticalAlignment="Center"/>
+                                <Button Content="365" Style="{StaticResource LinkButton}" Click="OnPreset" VerticalAlignment="Center" Margin="4,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Unrecognized hardware -->
+                <Border Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1"
+                        CornerRadius="8" Padding="12,10" Margin="0,8,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox x:Name="IncludeUnrecognizedCheck" Style="{StaticResource FluentCheck}"
+                                  IsChecked="False" VerticalAlignment="Center"/>
+                        <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" FontSize="13"
+                                   MouseLeftButtonUp="OnToggleUnrecognized" Cursor="Hand"
+                                   ToolTip="Lists devices that matched no definition. Mostly in-box-driver hardware, for troubleshooting or looking up an unknown hardware ID (e.g. at devicehunt.com).">
+                            <Run Text="Include unrecognized hardware" FontWeight="SemiBold"/>
+                            <Run Text=" (advanced)" Foreground="{DynamicResource Dim}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- System health -->
+                <Border Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1"
+                        CornerRadius="8" Padding="12,10" Margin="0,8,0,0">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox x:Name="IncludeHealthCheck" Style="{StaticResource FluentCheck}"
+                                      IsChecked="True" VerticalAlignment="Center"/>
+                            <TextBlock Text="Include system health"
+                                       VerticalAlignment="Center" Margin="10,0,0,0" FontSize="13" FontWeight="SemiBold"
+                                       MouseLeftButtonUp="OnToggleHealth" Cursor="Hand"/>
+                        </StackPanel>
+                        <TextBlock Foreground="{DynamicResource Muted}" TextWrapping="Wrap" FontSize="11.5" Margin="30,6,0,0"
+                                   Text="Storage wear, free space, memory and battery, read-only. Includes disk model names, review before sharing."/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Also write -->
+                <Border Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1"
+                        CornerRadius="8" Padding="12,10" Margin="0,8,0,0">
+                    <StackPanel>
+                        <TextBlock Text="ALSO WRITE" Style="{StaticResource ColLabel}" Margin="0,0,0,7"/>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox x:Name="IncludeCsvCheck" Style="{StaticResource FluentCheck}" IsChecked="False" VerticalAlignment="Center"/>
+                            <TextBlock Text="devices.csv (driver table, for a spreadsheet)"
+                                       VerticalAlignment="Center" Margin="10,0,0,0" FontSize="12.5"
+                                       MouseLeftButtonUp="OnToggleCsv" Cursor="Hand"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
+                            <CheckBox x:Name="IncludeJsonCheck" Style="{StaticResource FluentCheck}" IsChecked="False" VerticalAlignment="Center"/>
+                            <TextBlock Text="report.json (machine-readable, for automation)"
+                                       VerticalAlignment="Center" Margin="10,0,0,0" FontSize="12.5"
+                                       MouseLeftButtonUp="OnToggleJson" Cursor="Hand"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
+                            <CheckBox x:Name="IncludeLogCheck" Style="{StaticResource FluentCheck}" IsChecked="True" VerticalAlignment="Center"/>
+                            <TextBlock Text="venquery-log.txt (this session's diagnostic log, for support)"
+                                       VerticalAlignment="Center" Margin="10,0,0,0" FontSize="12.5"
+                                       MouseLeftButtonUp="OnToggleLog" Cursor="Hand"/>
+                        </StackPanel>
+                        <TextBlock Foreground="{DynamicResource Dim}" TextWrapping="Wrap" FontSize="11" Margin="30,6,0,0"
+                                   Text="Saved beside the text report (the text report is always written)."/>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

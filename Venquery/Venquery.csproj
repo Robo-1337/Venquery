@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Venquery</RootNamespace>
+    <AssemblyName>Venquery</AssemblyName>
+    <Product>Venquery</Product>
+    <Description>Venquery, a Windows toolkit for drivers, backups, files and PC health. Uses only Windows' own tools. Never installs anything on its own.</Description>
+    <Version>1.4.2</Version>
+    <Authors>Venquery</Authors>
+    <ApplicationIcon>venquery.ico</ApplicationIcon>
+    <!-- Per-Monitor V2 DPI awareness (see app.manifest) so the UI stays crisp on scaled monitors. -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Framework-dependent builds also run on a newer .NET runtime when 8.0 isn't installed. -->
+    <RollForward>Major</RollForward>
+    <!-- WPF's native DLLs must be bundled into a single-file exe or it fails to start. -->
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- PROTOOLS = the Repair Kit page, CLI = the headless health and report commands. -->
+    <DefineConstants>$(DefineConstants);EDITION_COMMUNITY;PROTOOLS;CLI</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Venquery.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.Diagnostics.EventLog" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="venquery.ico" />
+    <Resource Include="venquery.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="definitions.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

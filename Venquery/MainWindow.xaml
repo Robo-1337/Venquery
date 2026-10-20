@@ -1,0 +1,1731 @@
+<Window x:Class="Venquery.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Venquery" Width="1180" Height="900"
+        MinWidth="920" MinHeight="640"
+        Background="{DynamicResource Mica}"
+        FontFamily="Segoe UI Variable Display, Segoe UI Variable, Segoe UI"
+        Foreground="{DynamicResource Text}"
+        WindowStartupLocation="CenterScreen"
+        Loaded="OnWindowLoaded"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="ClearType">
+
+    <!-- 1.4.1: the title bar is drawn by the app (built into the window like modern apps). WindowChrome keeps
+         Windows' own move / double-click / resize / system menu; the caption buttons are ours (MainWindow.Chrome.cs,
+         which also gives the maximise button Windows 11's Snap Layouts). A 1px glass edge keeps the shadow. -->
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="52" ResizeBorderThickness="6" GlassFrameThickness="0,0,0,1"
+                      CornerRadius="0" UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+
+    <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- title bar -->
+            <RowDefinition Height="*"/>     <!-- body: rail + content layer -->
+        </Grid.RowDefinitions>
+
+        <!-- ================= CUSTOM BACKGROUND ================= -->
+        <!-- Bottom-most layer: a user-imported image behind the whole window. The title bar, rail and content
+             layer are translucent, so it shows through them; when an image is on, ApplyBackgroundScrims gives
+             those surfaces a scrim (ChromeOverImage / LayerOverImage) so text stays readable, and the slider
+             blends the image toward the theme colour. Hidden unless the user picks an image in Settings. -->
+        <Image x:Name="BgImage" Grid.RowSpan="2" Stretch="UniformToFill" Visibility="Collapsed"
+               IsHitTestVisible="False" RenderOptions.BitmapScalingMode="HighQuality"/>
+
+        <!-- A soft accent tint from the top-left corner (the hybrid look's Mica tint). Follows the theme accent. -->
+        <Border Grid.RowSpan="2" Background="{DynamicResource Accent}" Opacity="0.11" IsHitTestVisible="False">
+            <Border.OpacityMask>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FF000000" Offset="0"/>
+                    <GradientStop Color="#00000000" Offset="0.5"/>
+                </LinearGradientBrush>
+            </Border.OpacityMask>
+        </Border>
+
+        <!-- ================= TITLE BAR ================= -->
+        <!-- Integrated with the window background (Windows 11 style); ApplyBackgroundScrims sets a scrim when a
+             background image is showing. -->
+        <Grid x:Name="TitleBar" Grid.Row="0" Height="52" Background="Transparent">
+            <!-- Left (logo + name) and right (actions + window buttons) size to their content; the Safe Mode pill
+                 gets the space between and trims its text when the window is narrow, so nothing overlaps. -->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Mockup C: a small logo, the name in bold and the status (version first) beside it in dim text. -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="18,0,16,0" MaxWidth="300">
+                <Image x:Name="LogoImage" Width="22" Height="22" Margin="0,0,10,0" VerticalAlignment="Center"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                <TextBlock x:Name="AppNameText" Text="Venquery" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock x:Name="StatusLine" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="8,1,0,0"
+                           ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"
+                           Foreground="{DynamicResource Dim}" Text="v0.30.2 · ready"/>
+            </StackPanel>
+
+            <!-- The Safe Mode pill, centred (mockup C: rounded, accent outline, bold label + muted wording). -->
+            <Border x:Name="SafeModePill" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                    CornerRadius="14" Padding="14,5" Margin="0,0,10,0"
+                    Background="{DynamicResource InfoBg}" BorderBrush="{DynamicResource InfoBd}" BorderThickness="1">
+                <DockPanel>
+                    <Path DockPanel.Dock="Left" Data="{StaticResource IcoBackupAll}" Stroke="{DynamicResource Accent}" StrokeThickness="1.6"
+                          Width="15" Height="15" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                          Fill="Transparent" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock x:Name="SafeModeText" VerticalAlignment="Center" FontSize="12.5" TextTrimming="CharacterEllipsis">
+                        <Run Text="Safe Mode" FontWeight="SemiBold" Foreground="{DynamicResource Text}"/>
+                        <Run x:Name="SafeModeDescriptor" Text=" No auto-install protocol. Files are only downloaded." Foreground="{DynamicResource Muted}"/>
+                    </TextBlock>
+                </DockPanel>
+            </Border>
+
+            <!-- Window buttons (minimise / maximise-restore / close), top-right like Windows 11. -->
+            <StackPanel x:Name="CaptionButtons" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                        VerticalAlignment="Top" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button x:Name="MinButton" Style="{StaticResource CaptionButton}" Click="OnMinimize" ToolTip="Minimize"
+                        AutomationProperties.Name="Minimize">
+                    <Path Data="{StaticResource CapMin}" Style="{StaticResource CaptionGlyph}"/>
+                </Button>
+                <Button x:Name="MaxButton" Style="{StaticResource CaptionButton}" Click="OnMaximizeRestore" ToolTip="Maximize"
+                        AutomationProperties.Name="Maximize">
+                    <Path x:Name="MaxGlyph" Data="{StaticResource CapMax}" Style="{StaticResource CaptionGlyph}"/>
+                </Button>
+                <Button x:Name="CloseButton" Style="{StaticResource CaptionCloseButton}" Click="OnCloseWindow" ToolTip="Close"
+                        AutomationProperties.Name="Close">
+                    <Path Data="{StaticResource CapClose}" Style="{StaticResource CaptionGlyph}"/>
+                </Button>
+            </StackPanel>
+
+            <!-- Flat Export / Log / theme buttons (mockup C), left of the window buttons. -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                        VerticalAlignment="Center" Margin="0,0,150,0" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button x:Name="ExportButton" Style="{StaticResource GhostButton}" Click="OnExportReport"
+                        Margin="0,0,2,0" ToolTip="Save a text report of all detected devices and drivers">
+                    <StackPanel Orientation="Horizontal">
+                        <Path Style="{StaticResource BtnIcon}" Data="M12,15 V4 M7,9 L12,4 L17,9 M5,20 H19"/>
+                        <TextBlock Text="Export" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="ViewLogButton" Style="{StaticResource GhostButton}" Click="OnToggleLog" ToolTip="View the session log"
+                        AutomationProperties.Name="View Log">
+                    <StackPanel Orientation="Horizontal">
+                        <Path Style="{StaticResource BtnIcon}" Data="M7,3 H14 L18,7 V21 H7 Z M14,3 V7 H18 M10,12 H15 M10,16 H15"/>
+                        <TextBlock Text="Log" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="ThemeButton" Style="{StaticResource GhostButton}" Click="OnToggleTheme"
+                        Padding="9,6" Margin="2,0,0,0" ToolTip="Toggle light / dark theme">
+                    <Path x:Name="ThemeIcon" Width="17" Height="17" Stretch="Uniform" StrokeThickness="1.6"
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                          Fill="Transparent" Stroke="{DynamicResource Text}"
+                          Data="M21,12.8 A9,9 0 1 1 11.2,3 A7,7 0 0 0 21,12.8 Z"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- ================= BODY ================= -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="BodyCol0" Width="84"/>
+                <ColumnDefinition x:Name="BodyCol1" Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ============ NAV RAIL (labelled pages; tabs live in the page header) ============ -->
+            <Border x:Name="NavRail" Grid.Column="0" Background="Transparent">
+                <DockPanel LastChildFill="False">
+                <StackPanel x:Name="NavStack" DockPanel.Dock="Top" Margin="0,4,0,0">
+                    <RadioButton x:Name="NavDrivers" GroupName="nav" Style="{StaticResource NavItem}"
+                                 Tag="drivers" IsChecked="True" Checked="OnNavChanged" ToolTip="Devices &amp; Drivers">
+                        <StackPanel>
+                            <Path Style="{StaticResource NavRailIcon}" Data="{StaticResource IcoDrivers}"/>
+                            <TextBlock Style="{StaticResource NavLabel}" Text="Devices &amp; Drivers"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavBackup" GroupName="nav" Style="{StaticResource NavItem}"
+                                 Tag="backup" Checked="OnNavChanged" ToolTip="Backup &amp; Restore">
+                        <StackPanel>
+                            <Path Style="{StaticResource NavRailIcon}" Data="{StaticResource IcoBackup}"/>
+                            <TextBlock Style="{StaticResource NavLabel}" Text="Backup &amp; Restore"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavFiles" GroupName="nav" Style="{StaticResource NavItem}"
+                                 Tag="files" Checked="OnNavChanged" ToolTip="Files">
+                        <StackPanel>
+                            <Path Style="{StaticResource NavRailIcon}" Data="{StaticResource IcoFiles}"/>
+                            <TextBlock Style="{StaticResource NavLabel}" Text="Files"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavHealth" GroupName="nav" Style="{StaticResource NavItem}"
+                                 Tag="health" Checked="OnNavChanged" ToolTip="Health &amp; Repair">
+                        <StackPanel>
+                            <Path Style="{StaticResource NavRailIcon}" Data="{StaticResource IcoHealth}"/>
+                            <TextBlock Style="{StaticResource NavLabel}" Text="Health &amp; Repair"/>
+                        </StackPanel>
+                    </RadioButton>
+                </StackPanel>
+                    <!-- Mockup C: Settings sits at the bottom, under a thin divider. -->
+                    <RadioButton x:Name="NavSettings" DockPanel.Dock="Bottom" GroupName="nav"
+                                 Style="{StaticResource NavItem}" Tag="settings" Checked="OnNavChanged"
+                                 Margin="0,0,0,10" ToolTip="Settings">
+                        <StackPanel>
+                            <Path Style="{StaticResource NavRailIcon}" Data="{StaticResource IcoSettings}"/>
+                            <TextBlock Style="{StaticResource NavLabel}" Text="Settings"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <Border DockPanel.Dock="Bottom" Height="1" Margin="14,0,14,0" Background="{DynamicResource Line}"/>
+                </DockPanel>
+            </Border>
+
+            <!-- ============ CONTENT LAYER (rounded; page header + the active view + task band + footer) ============ -->
+            <Border x:Name="ContentLayer" Grid.Column="1" CornerRadius="14,0,0,0" Background="{DynamicResource Layer}"
+                    BorderBrush="{DynamicResource Line}" BorderThickness="1,1,0,0" ClipToBounds="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>  <!-- page header -->
+                    <RowDefinition Height="*"/>     <!-- active view -->
+                    <RowDefinition Height="Auto"/>  <!-- global task band -->
+                    <RowDefinition Height="Auto"/>  <!-- footer (Devices & Drivers) -->
+                </Grid.RowDefinitions>
+
+                <!-- Page header: title, one-line subtitle, page actions, and the page's tabs (built by ShowSection). -->
+                <StackPanel x:Name="PageHeader" Grid.Row="0" Margin="30,22,30,0">
+                    <DockPanel>
+                        <StackPanel x:Name="HeaderActions" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="PageTitleText" Style="{StaticResource PageTitle}" Text="Devices &amp; Drivers"
+                                   VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <TextBlock x:Name="PageSubtitleText" Style="{StaticResource PageSubtitle}"/>
+                    <StackPanel x:Name="PageTabs" Orientation="Horizontal" Margin="0,18,0,0" Visibility="Collapsed"/>
+                </StackPanel>
+
+            <!-- ============ CONTENT HOST (all views stacked; one visible) ============ -->
+            <Grid x:Name="ContentHost" Grid.Row="1">
+
+            <!-- ===== VIEW: DRIVERS (summary tiles + master-detail) ===== -->
+            <Grid x:Name="DriversView">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="340"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+            <!-- Summary tiles (real scan numbers; "Not scanned yet" until the scan finishes). -->
+            <UniformGrid Rows="1" x:Name="DriverTiles" Grid.Row="0" Grid.ColumnSpan="2" Margin="30,16,18,18"/>
+
+
+            <!-- Sidebar (master) -->
+            <Border Grid.Row="1" Grid.Column="0" Margin="30,0,0,14" CornerRadius="12" Background="{DynamicResource Card}"
+                    BorderBrush="{DynamicResource Line}" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="1" Margin="12,12,12,8" Background="{DynamicResource Ctl}"
+                            BorderBrush="{DynamicResource CtlBd}" BorderThickness="1" CornerRadius="8" Padding="11,7">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Path Grid.Column="0" Data="M11,4 A7,7 0 0 1 18,11 A7,7 0 0 1 11,18 A7,7 0 0 1 4,11 A7,7 0 0 1 11,4 Z M16.5,16.5 L21,21"
+                                  Stroke="{DynamicResource Dim}" StrokeThickness="1.7" Width="16" Height="16"
+                                  Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,9,0"/>
+                            <Grid Grid.Column="1">
+                                <TextBlock x:Name="SearchPlaceholder" Text="Find a device…" Foreground="{DynamicResource Dim}"
+                                           FontSize="13" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                                <TextBox x:Name="SearchBox" BorderThickness="0" Background="Transparent"
+                                         Foreground="{DynamicResource Text}" CaretBrush="{DynamicResource Text}"
+                                         VerticalAlignment="Center" FontSize="13" TextChanged="OnSearchChanged"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <DockPanel Grid.Row="2" Margin="18,8,16,6">
+                        <TextBlock x:Name="HardwareCount" DockPanel.Dock="Left" Text="HARDWARE"
+                                   Style="{StaticResource ColLabel}" VerticalAlignment="Center"/>
+                        <Button x:Name="SelectAllButton" DockPanel.Dock="Right" HorizontalAlignment="Right"
+                                Style="{StaticResource LinkButton}" Content="Select All" Click="OnSelectAllClick"/>
+                    </DockPanel>
+
+                    <ListBox x:Name="DeviceList" Grid.Row="3" Background="Transparent" BorderThickness="0"
+                             Padding="8,2,8,12" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             VirtualizingPanel.ScrollUnit="Pixel"
+                             SelectionChanged="OnDeviceSelectionChanged">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Margin" Value="0,2,0,0"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Text}"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="B" Background="Transparent" CornerRadius="6" Padding="10,9">
+                                                <Grid>
+                                                    <Border x:Name="Bar" Width="3" Height="18" CornerRadius="2"
+                                                            Background="{DynamicResource Accent}" HorizontalAlignment="Left"
+                                                            Visibility="Collapsed"/>
+                                                    <ContentPresenter Margin="6,0,0,0"/>
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="B" Property="Background" Value="{DynamicResource SubtleHover}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="B" Property="Background" Value="{DynamicResource Subtle}"/>
+                                                    <Setter TargetName="Bar" Property="Visibility" Value="Visible"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox Grid.Column="0" Style="{StaticResource FluentCheck}" VerticalAlignment="Center"
+                                              Margin="0,0,11,0" IsEnabled="{Binding HasDirectUrl}"
+                                              IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              ToolTip="Rows without a published direct file can’t be bulk-downloaded, use the support page."/>
+                                    <Grid Grid.Column="1" Width="22" Height="22" Margin="0,0,11,0" VerticalAlignment="Center">
+                                        <Path Data="{Binding Category, Converter={StaticResource CatIcon}}"
+                                              Stroke="{DynamicResource Muted}" StrokeThickness="1.6" Fill="Transparent"
+                                              Stretch="Uniform" Width="19" Height="19"/>
+                                        <Ellipse Width="8" Height="8" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                 Margin="0,-2,-3,0" Fill="{DynamicResource AmberDot}" Stroke="{DynamicResource Mica}" StrokeThickness="2"
+                                                 Visibility="{Binding HasUpdateDot, Converter={StaticResource BoolToVis}}"/>
+                                    </Grid>
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Text}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding ListSubtitle}" FontSize="11.5"
+                                                   TextTrimming="CharacterEllipsis">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource Dim}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding HasUpdateDot}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource Amber}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- Detail pane -->
+            <Border Grid.Row="1" Grid.Column="1" Margin="16,0,30,14" CornerRadius="12" Background="{DynamicResource Card}"
+                    BorderBrush="{DynamicResource Line}" BorderThickness="1" ClipToBounds="True">
+            <Grid>
+                <TextBlock x:Name="EmptyDetail" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Dim}" FontSize="14" TextAlignment="Center">
+                    Scanning your hardware…<LineBreak/>
+                    <Run FontSize="12">Recognized devices with an official driver source will appear on the left.</Run>
+                </TextBlock>
+
+                <ScrollViewer x:Name="DetailScroll" VerticalScrollBarVisibility="Auto"
+                              DataContext="{Binding SelectedItem, ElementName=DeviceList}" Visibility="Collapsed">
+                    <StackPanel Margin="22,20,22,24" MaxWidth="900" HorizontalAlignment="Left">
+
+                        <!-- Header -->
+                        <DockPanel Margin="0,0,0,20">
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ChromeButton}" Click="OnCopyInfo"
+                                    VerticalAlignment="Top" Padding="10,7" ToolTip="Copy the device name to the clipboard">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="M9,3 H16 V16 H9 Z M6,7 H4 V21 H15 V19" Stroke="{DynamicResource Text}"
+                                          StrokeThickness="1.7" Width="14" Height="14" Stretch="Uniform" Fill="Transparent" Margin="0,0,7,0"/>
+                                    <TextBlock Text="Copy" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <DockPanel LastChildFill="True">
+                                <Border DockPanel.Dock="Left" VerticalAlignment="Top" Width="56" Height="56" CornerRadius="12" Background="{DynamicResource SubtleHover}"
+                                        BorderBrush="{DynamicResource Line}" BorderThickness="1" Margin="0,0,14,0">
+                                    <Path Data="{Binding Category, Converter={StaticResource CatIcon}}"
+                                          Stroke="{DynamicResource Muted}" StrokeThickness="1.4" Fill="Transparent"
+                                          Stretch="Uniform" Width="30" Height="30"/>
+                                </Border>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                        <TextBlock Text="{Binding Category}" FontSize="11.5" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Dim}" VerticalAlignment="Center"/>
+                                        <TextBlock Text="  •  " Foreground="{DynamicResource Dim}" VerticalAlignment="Center"/>
+                                        <Border CornerRadius="20" Padding="8,3" Background="{DynamicResource GreenBg}"
+                                                BorderBrush="{DynamicResource GreenBd}" BorderThickness="1"
+                                                Visibility="{Binding HasVerifiedSource, Converter={StaticResource BoolToVis}}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Path Data="M12,2 L20,5 V11 C20,16 12,20 12,20 C12,20 4,16 4,11 V5 Z M9,11 L11,13 L15,9"
+                                                      Stroke="{DynamicResource Green}" StrokeThickness="1.6" Fill="Transparent"
+                                                      Stretch="Uniform" Width="13" Height="13" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                <TextBlock Text="{Binding VerifiedText}" FontSize="12" Foreground="{DynamicResource Green}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DockPanel>
+                        </DockPanel>
+
+                        <!-- Laptop OEM guidance (code-controlled visibility) -->
+                        <Border x:Name="OemGuidanceBar" Visibility="Collapsed" CornerRadius="8" Margin="0,0,0,20"
+                                Background="{DynamicResource InfoBg}" BorderBrush="{DynamicResource InfoBd}" BorderThickness="1"
+                                Padding="14,11" Cursor="Hand" MouseLeftButtonUp="OnDirectFileClick">
+                            <DockPanel>
+                                <Path DockPanel.Dock="Left" Data="M9,18 H15 M10,21 H14 M12,2 A7,7 0 0 0 8,15 H16 A7,7 0 0 0 12,2 Z"
+                                      Stroke="{DynamicResource Accent}" StrokeThickness="2.0" Fill="Transparent"
+                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Width="20" Height="20" Stretch="Uniform" VerticalAlignment="Top" Margin="0,1,11,0"/>
+                                <TextBlock x:Name="OemGuidanceText" Foreground="{DynamicResource Text}" FontSize="12.5"
+                                           TextWrapping="Wrap"/>
+                            </DockPanel>
+                        </Border>
+
+                        <!-- Live download progress (per device); stays visible after completion
+                             so the saved-file name and signature result remain readable. -->
+                        <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                BorderThickness="1" Padding="16,13" Margin="0,0,0,20"
+                                Visibility="{Binding HasProgress, Converter={StaticResource BoolToVis}}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding ProgressText}" FontWeight="SemiBold" FontSize="12.5"
+                                           TextWrapping="Wrap">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{DynamicResource Amber}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ProgressKind}" Value="ok">
+                                                    <Setter Property="Foreground" Value="{DynamicResource Green}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ProgressKind}" Value="fail">
+                                                    <Setter Property="Foreground" Value="{DynamicResource Red}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <Border CornerRadius="5" Height="10" Background="{DynamicResource Ctl}" Margin="0,8,0,0"
+                                        Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVis}}">
+                                    <ProgressBar Height="10" Minimum="0" Maximum="100" Value="{Binding Progress, Mode=OneWay}"
+                                                 Foreground="{DynamicResource Accent}" Background="Transparent" BorderThickness="0"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Driver Options -->
+                        <TextBlock Text="Driver Options" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                        <Border CornerRadius="0" Background="Transparent" BorderBrush="Transparent"
+                                BorderThickness="0" Padding="0" Margin="0,0,0,22">
+                            <StackPanel>
+                                <!-- Legacy GPU notice: this card is on a vendor legacy driver branch, so the
+                                     newest driver either won't install or isn't the right package. -->
+                                <Border CornerRadius="7" Padding="12,10" Margin="0,0,0,14"
+                                        Background="{DynamicResource AmberBg}" BorderBrush="{DynamicResource AmberBd}"
+                                        BorderThickness="1"
+                                        Visibility="{Binding HasLegacyNotice, Converter={StaticResource BoolToVis}}">
+                                    <DockPanel>
+                                        <Path DockPanel.Dock="Left" Data="M12,2 L22,20 H2 Z M12,9 V14.5 M12,17.3 H12.01"
+                                              Stroke="{DynamicResource Amber}" StrokeThickness="2.0" StrokeLineJoin="Round" Fill="Transparent"
+                                              StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                              Width="20" Height="20" Stretch="Uniform" VerticalAlignment="Top" Margin="0,1,10,0"/>
+                                        <TextBlock Text="{Binding LegacyNotice}" Foreground="{DynamicResource Amber}"
+                                                   FontSize="12.5" TextWrapping="Wrap"/>
+                                    </DockPanel>
+                                </Border>
+                                <TextBlock Text="{Binding StatusText}" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap"
+                                           Margin="0,0,0,14">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding StatusKind}" Value="update">
+                                                    <Setter Property="Foreground" Value="{DynamicResource Amber}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding StatusKind}" Value="current">
+                                                    <Setter Property="Foreground" Value="{DynamicResource Green}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding StatusKind}" Value="rollback">
+                                                    <Setter Property="Foreground" Value="{DynamicResource Link}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <TextBlock Text="SELECTED VERSION" Style="{StaticResource ColLabel}" Margin="0,0,0,5"
+                                           Visibility="{Binding HasVersions, Converter={StaticResource BoolToVis}}"/>
+                                <ComboBox Style="{StaticResource FluentCombo}" ItemContainerStyle="{StaticResource FluentComboItem}"
+                                          ItemsSource="{Binding VisibleVersions}"
+                                          SelectedItem="{Binding SelectedVersion, Mode=OneWay}"
+                                          SelectionChanged="OnVersionSelectionChanged"
+                                          Visibility="{Binding HasVersions, Converter={StaticResource BoolToVis}}"/>
+
+                                <StackPanel Margin="0,12,0,0" Visibility="{Binding HasDirectUrl, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Style="{StaticResource ColLabel}" Text="SOURCE, DIRECT FILE (matches selected version)"/>
+                                    <TextBlock Text="{Binding DirectUrlDisplay}" Tag="{Binding DirectUrl}"
+                                               Foreground="{DynamicResource Link}" FontFamily="Cascadia Code, Consolas" FontSize="12"
+                                               TextWrapping="Wrap" Cursor="Hand" TextDecorations="Underline" Margin="0,3,0,0"
+                                               MouseLeftButtonUp="OnDirectFileClick"
+                                               ToolTip="Click to open this exact file URL in your browser"/>
+                                </StackPanel>
+
+                                <Border CornerRadius="7" Background="{DynamicResource Pane2}" BorderBrush="{DynamicResource Line}"
+                                        BorderThickness="1" Padding="14,12" Margin="0,4,0,0" Cursor="Hand"
+                                        Tag="{Binding SupportPage}" MouseLeftButtonUp="OnDirectFileClick"
+                                        Visibility="{Binding NoDirectDownload, Converter={StaticResource BoolToVis}}">
+                                    <DockPanel>
+                                        <Path DockPanel.Dock="Right" Data="M9,6 L15,12 L9,18" Stroke="{DynamicResource Dim}"
+                                              StrokeThickness="1.7" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding SupportPageDisplay}" Foreground="{DynamicResource Link}"
+                                                       FontFamily="Cascadia Code, Consolas" FontSize="12.5" TextWrapping="Wrap"/>
+                                            <TextBlock Text="Official manufacturer support page, download manually" FontSize="11.5"
+                                                       Foreground="{DynamicResource Muted}" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Component Information -->
+                        <TextBlock Text="Component Information" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                        <Border CornerRadius="10" Background="{DynamicResource Subtle}" BorderBrush="Transparent"
+                                BorderThickness="0" Padding="16,4" Margin="0,0,0,22">
+                            <StackPanel>
+                                <Grid Margin="0,13,0,13">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Currently Installed" FontSize="13" Foreground="{DynamicResource Muted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding InstalledVersion}" FontSize="13"
+                                               FontFamily="Cascadia Code, Consolas" TextWrapping="Wrap"/>
+                                </Grid>
+                                <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0"
+                                        Visibility="{Binding HasInstalledDate, Converter={StaticResource BoolToVis}}"/>
+                                <Grid Margin="0,13,0,13" Visibility="{Binding HasInstalledDate, Converter={StaticResource BoolToVis}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Driver Date" FontSize="13" Foreground="{DynamicResource Muted}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding InstalledDateText}" FontSize="13"
+                                               FontFamily="Cascadia Code, Consolas" TextWrapping="Wrap">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource Text}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding InstalledIsOld}" Value="True">
+                                                        <Setter Property="Foreground" Value="{DynamicResource Amber}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                                <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0"/>
+                                <Grid Margin="0,13,0,13">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Hardware IDs" FontSize="13" Foreground="{DynamicResource Muted}"/>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{Binding HardwareId}" FontSize="12.5" Foreground="{DynamicResource Text}"
+                                                   FontFamily="Cascadia Code, Consolas" TextWrapping="Wrap"/>
+                                        <!-- Clickable disclosure: expand to see the other components that share this driver -->
+                                        <StackPanel Margin="0,5,0,0"
+                                                    Visibility="{Binding HasMultipleMatches, Converter={StaticResource BoolToVis}}">
+                                            <ToggleButton x:Name="MoreMatchesToggle" Style="{StaticResource DisclosureToggle}"
+                                                          Content="{Binding MatchNote}"/>
+                                            <ItemsControl ItemsSource="{Binding OtherMatches}" Margin="14,7,0,0"
+                                                          Visibility="{Binding IsChecked, ElementName=MoreMatchesToggle, Converter={StaticResource BoolToVis}}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Margin="0,0,0,8">
+                                                            <TextBlock Text="{Binding Name}" FontSize="12.5"
+                                                                       Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="{Binding RawHardwareId}" FontSize="11.5"
+                                                                       FontFamily="Cascadia Code, Consolas" Foreground="{DynamicResource Dim}"
+                                                                       TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Optional Software -->
+                        <TextBlock Margin="0,0,0,10">
+                            <Run Text="Optional Software" FontSize="15" FontWeight="SemiBold"/>
+                            <Run Text="  (Separate links, never bundled)" FontSize="12" Foreground="{DynamicResource Dim}"/>
+                        </TextBlock>
+                        <ItemsControl ItemsSource="{Binding OptionalTools}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                            BorderThickness="1" Padding="16,14" Margin="0,0,0,10" Cursor="Hand"
+                                            Tag="{Binding Url}" MouseLeftButtonUp="OnDirectFileClick">
+                                        <DockPanel>
+                                            <Path DockPanel.Dock="Right" Data="M9,6 L15,12 L9,18" Stroke="{DynamicResource Dim}"
+                                                  StrokeThickness="1.7" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" FontSize="13.5" FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource Link}"/>
+                                                <TextBlock Text="{Binding Note}" FontSize="12.5" Foreground="{DynamicResource Muted}"
+                                                           Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+            </Border>
+            </Grid>
+            <!-- ===== /VIEW: DRIVERS ===== -->
+
+            <!-- ===== VIEW: BACKUP & RESTORE ===== -->
+            <Grid x:Name="BackupView" Visibility="Collapsed" Background="Transparent">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="30,16,30,30">
+                        <!-- Two tabs: back up installed apps (winget) / restore from any Venquery backup. -->
+                        <WrapPanel Margin="0,0,0,16" Visibility="Collapsed">
+                            <CheckBox x:Name="BackupTabApps" Style="{StaticResource PillCheck}" Content="Back up apps" IsChecked="True" Checked="OnBackupTabApps" Unchecked="OnBackupTabUnchecked"/>
+                            <CheckBox x:Name="BackupTabRestore" Style="{StaticResource PillCheck}" Content="Restore from a backup" Checked="OnBackupTabRestore" Unchecked="OnBackupTabUnchecked" Margin="6,0,0,0"/>
+                        </WrapPanel>
+                        <!-- Mockup C layout: tiles, then the app list (left) and Save to / What you get / Back up (right).
+                             The list loads by itself when the tab opens (read-only) if winget is present. -->
+                        <StackPanel x:Name="BackupAppsMode">
+                        <TextBlock x:Name="BackupStatus" Visibility="Collapsed" FontSize="12.5" Margin="0,0,0,14"
+                                   Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
+
+                        <StackPanel x:Name="BackupResultsPanel" Visibility="Collapsed">
+                            <UniformGrid Rows="1" Margin="0,0,-12,18">
+                                <Border Style="{StaticResource TileHero}">
+                                    <Grid><Path Style="{StaticResource TileHeroIcon}" Data="{StaticResource IcoApps}"/><StackPanel>
+                                        <TextBlock x:Name="BackupCountFound" Text="0" Style="{StaticResource TileHeroValue}"/>
+                                        <TextBlock Text="installed apps found" Style="{StaticResource TileHeroLabel}"/>
+                                    </StackPanel></Grid>
+                                </Border>
+                                <Border Style="{StaticResource Tile}">
+                                    <Grid><Path Style="{StaticResource TileIcon}" Data="{StaticResource IcoUpdate}"/><StackPanel>
+                                        <TextBlock x:Name="BackupCountRestorable" Text="0" Style="{StaticResource TileValue}"/>
+                                        <TextBlock Text="reinstallable with winget" Style="{StaticResource TileLabel}"/>
+                                    </StackPanel></Grid>
+                                </Border>
+                                <Border Style="{StaticResource Tile}">
+                                    <Grid><Path Style="{StaticResource TileIcon}" Data="{StaticResource IcoWarn}"/><StackPanel>
+                                        <TextBlock x:Name="BackupCountManual" Text="0" Style="{StaticResource TileValue}"/>
+                                        <TextBlock Text="need a manual reinstall" Style="{StaticResource TileLabel}"/>
+                                    </StackPanel></Grid>
+                                </Border>
+                                <Border Style="{StaticResource Tile}">
+                                    <Grid><Path Style="{StaticResource TileIcon}" Data="{StaticResource IcoFiles}"/><StackPanel>
+                                        <TextBlock x:Name="BackupDestTileValue" Text="Downloads" Style="{StaticResource TileValue}"/>
+                                        <TextBlock Text="backup destination" Style="{StaticResource TileLabel}"/>
+                                    </StackPanel></Grid>
+                                </Border>
+                            </UniformGrid>
+                        </StackPanel>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Left: the apps -->
+                            <Border Grid.Column="0" VerticalAlignment="Top" CornerRadius="12" Background="{DynamicResource Card}"
+                                    BorderBrush="{DynamicResource Line}" BorderThickness="1" Padding="10,10,10,8">
+                                <StackPanel>
+                                    <DockPanel Margin="8,2,2,8">
+                                        <Button x:Name="CreateBackupButton" DockPanel.Dock="Right" Style="{StaticResource ChromeButton}"
+                                                Padding="10,5" Margin="8,0,0,0" Click="OnCreateBackup"
+                                                ToolTip="Read the apps installed on this PC (again). Nothing is written until you back up.">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Path Style="{StaticResource BtnIcon}" Data="{StaticResource IcoRefresh}"/>
+                                                <TextBlock Text="Read apps" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Border DockPanel.Dock="Right" Width="200" CornerRadius="8" Background="{DynamicResource Ctl}"
+                                                BorderBrush="{DynamicResource CtlBd}" BorderThickness="1" Padding="9,4">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Path Style="{StaticResource NavIcon}" Data="M11,4 A7,7 0 0 1 18,11 A7,7 0 0 1 11,18 A7,7 0 0 1 4,11 A7,7 0 0 1 11,4 Z M16.5,16.5 L21,21"
+                                                      Stroke="{DynamicResource Dim}" Width="14" Height="14" Margin="0,0,7,0"/>
+                                                <TextBox x:Name="BackupFilterBox" Grid.Column="1" BorderThickness="0" Background="Transparent"
+                                                         Foreground="{DynamicResource Text}" CaretBrush="{DynamicResource Text}" FontSize="12.5"
+                                                         VerticalAlignment="Center" TextChanged="OnBackupFilterChanged"/>
+                                                <TextBlock Grid.Column="1" Text="Filter" FontSize="12.5" Foreground="{DynamicResource Dim}"
+                                                           VerticalAlignment="Center" IsHitTestVisible="False" Margin="2,0,0,0"
+                                                           Visibility="{Binding Text.IsEmpty, ElementName=BackupFilterBox, Converter={StaticResource BoolToVis}}"/>
+                                            </Grid>
+                                        </Border>
+                                        <TextBlock x:Name="BackupAppsHeader" Text="APPS" Style="{StaticResource ColLabel}" FontSize="11.5"
+                                                   VerticalAlignment="Center"/>
+                                    </DockPanel>
+
+                                    <TextBlock x:Name="BackupEmpty" Foreground="{DynamicResource Dim}" FontSize="13" Margin="8,10,8,14"
+                                               TextWrapping="Wrap"
+                                               Text="Reading the apps installed on this PC… (or press “Read apps”). Nothing is written to disk until you back up."/>
+
+                                    <ItemsControl x:Name="BackupList">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="8,7">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <CheckBox Grid.Column="0" Style="{StaticResource FluentCheck}" VerticalAlignment="Center"
+                                                              Margin="0,0,12,0"
+                                                              IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <Path Grid.Column="1" Style="{StaticResource NavIcon}" Data="{StaticResource IcoApps}"
+                                                          Stroke="{DynamicResource Muted}" Width="16" Height="16" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Text="{Binding DisplayName}" FontSize="13.5" TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Text="{Binding Detail}" FontSize="11.5" Foreground="{DynamicResource Dim}"
+                                                                   Margin="0,1,0,0"/>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="3" Text="{Binding Version}" FontSize="12" Foreground="{DynamicResource Dim}"
+                                                               VerticalAlignment="Center" Margin="12,0,4,0"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <StackPanel x:Name="ManualPanel" Visibility="Collapsed" Margin="8,10,8,4">
+                                        <ToggleButton x:Name="ManualToggle" Style="{StaticResource DisclosureToggle}"
+                                                      Content="Show apps with no winget package"/>
+                                        <ItemsControl x:Name="ManualList" Margin="0,8,0,0"
+                                                      Visibility="{Binding IsChecked, ElementName=ManualToggle, Converter={StaticResource BoolToVis}}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0,6">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Grid.Column="0" CornerRadius="8" Padding="7,2" Margin="0,0,11,0"
+                                                                VerticalAlignment="Center" Background="{DynamicResource AmberBg}"
+                                                                BorderBrush="{DynamicResource AmberBd}" BorderThickness="1">
+                                                            <TextBlock Text="manual" FontSize="11" Foreground="{DynamicResource Amber}"/>
+                                                        </Border>
+                                                        <TextBlock Grid.Column="1" Text="{Binding DisplayName}" FontSize="13"
+                                                                   VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Right: where it goes, what you get, and the button -->
+                            <StackPanel Grid.Column="2">
+                                <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                        BorderThickness="1" Padding="18,16" Margin="0,0,0,14">
+                                    <StackPanel>
+                                        <TextBlock Text="Save to" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                        <Border CornerRadius="8" Background="{DynamicResource Ctl}" BorderBrush="{DynamicResource CtlBd}"
+                                                BorderThickness="1" Padding="10,7">
+                                            <DockPanel>
+                                                <Path DockPanel.Dock="Left" Style="{StaticResource NavIcon}" Data="{StaticResource IcoFiles}"
+                                                      Stroke="{DynamicResource Muted}" Width="15" Height="15" Margin="0,0,8,0"/>
+                                                <TextBlock x:Name="BackupDestText" FontSize="12.5" TextTrimming="CharacterEllipsis"
+                                                           VerticalAlignment="Center" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+                                            </DockPanel>
+                                        </Border>
+                                        <TextBlock x:Name="BackupMachineNote" FontSize="12" TextWrapping="Wrap" Margin="0,10,0,0"
+                                                   Foreground="{DynamicResource Muted}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                        BorderThickness="1" Padding="18,16" Margin="0,0,0,14">
+                                    <StackPanel>
+                                        <TextBlock Text="What you get" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <TextBlock Foreground="{DynamicResource Muted}" FontSize="12.5" TextWrapping="Wrap"
+                                                   Text="A portable list of this PC's installed apps (backup.json) plus a plain-text restore script (restore.ps1) you can read and run after a reinstall. Uses Windows' own winget."/>
+                                        <TextBlock Foreground="{DynamicResource Muted}" FontSize="12.5" TextWrapping="Wrap" Margin="0,8,0,0">
+                                            <Run Text="Nothing runs automatically." FontWeight="SemiBold" Foreground="{DynamicResource Text}"/>
+                                            <Run Text=" Venquery reads your installed apps and writes the two files to your Downloads folder. Restoring is a separate, deliberate act, you open the script, read it, and run it yourself."/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                                <Button x:Name="SaveBackupButton" HorizontalAlignment="Stretch" Style="{StaticResource AccentButton}"
+                                        Click="OnSaveBackup" IsEnabled="False" Padding="18,11">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Style="{StaticResource BtnIcon}" Data="{StaticResource IcoUpdate}"/>
+                                        <TextBlock x:Name="SaveBackupLabel" Text="Back up selected apps" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Border x:Name="BackupSavedBar" Visibility="Collapsed" CornerRadius="10" Margin="0,14,0,0"
+                                        Background="{DynamicResource GreenBg}" BorderBrush="{DynamicResource GreenBd}"
+                                        BorderThickness="1" Padding="14,12">
+                                    <StackPanel>
+                                        <TextBlock x:Name="BackupSavedText" Foreground="{DynamicResource Green}" FontWeight="SemiBold"
+                                                   FontSize="12.5" TextWrapping="Wrap"/>
+                                        <WrapPanel Margin="0,10,0,0">
+                                            <Button Style="{StaticResource ChromeButton}" Click="OnOpenBackupFolder"
+                                                    Content="Open folder" Margin="0,0,8,6"/>
+                                            <Button Style="{StaticResource ChromeButton}" Click="OnOpenScript"
+                                                    Content="Open restore.ps1" Margin="0,0,8,6"/>
+                                            <Button Style="{StaticResource ChromeButton}" Click="OnCopyRunCommand"
+                                                    Content="Copy run command" Margin="0,0,0,6"/>
+                                        </WrapPanel>
+                                        <TextBlock Foreground="{DynamicResource Green}" FontSize="11.5" Margin="0,6,0,0" TextWrapping="Wrap"
+                                                   Text="If double-clicking only opens the script in Notepad, or PowerShell blocks it, paste this into Terminal / PowerShell to run it (the bypass applies to this single run only, nothing persistent changes):"/>
+                                        <Border CornerRadius="8" Background="{DynamicResource Ctl}" BorderBrush="{DynamicResource CtlBd}"
+                                                BorderThickness="1" Padding="10,7" Margin="0,6,0,0">
+                                            <TextBox x:Name="RunCommandBox" IsReadOnly="True" BorderThickness="0" Background="Transparent"
+                                                     Foreground="{DynamicResource Text}" CaretBrush="{DynamicResource Text}"
+                                                     FontFamily="Cascadia Code, Consolas" FontSize="11.5" TextWrapping="Wrap"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                        </StackPanel>
+                        <ContentControl x:Name="RestoreHost" Visibility="Collapsed"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+            <!-- ===== /VIEW: BACKUP & RESTORE ===== -->
+
+            <!-- ===== VIEW: PORTABLE APPS ===== -->
+            <Grid x:Name="PortableView" Visibility="Collapsed" Background="Transparent">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="30,16,30,30">
+                        <UniformGrid Rows="1" Margin="0,0,-12,16" Visibility="{Binding Visibility, ElementName=PortableResultsPanel}">
+                            <Border Style="{StaticResource TileHero}">
+                                <Grid><Path Style="{StaticResource TileHeroIcon}" Data="{StaticResource IcoApps}"/><StackPanel>
+                                    <TextBlock x:Name="PortableExeText" Text="0" Style="{StaticResource TileHeroValue}"/>
+                                    <TextBlock Text="portable apps found" Style="{StaticResource TileHeroLabel}"/>
+                                </StackPanel></Grid>
+                            </Border>
+                            <Border Style="{StaticResource Tile}">
+                                <Grid><Path Style="{StaticResource TileIcon}" Data="{StaticResource IcoBackupAll}"/><StackPanel>
+                                    <TextBlock x:Name="PortableSignedText" Text="0" Style="{StaticResource TileValue}"/>
+                                    <TextBlock Text="signed by their publisher" Style="{StaticResource TileLabel}"/>
+                                </StackPanel></Grid>
+                            </Border>
+                            <Border Style="{StaticResource Tile}">
+                                <Grid><Path Style="{StaticResource TileIcon}" Data="{StaticResource IcoWarn}"/><StackPanel>
+                                    <TextBlock x:Name="PortableUnsignedText" Text="0" Style="{StaticResource TileValue}"/>
+                                    <TextBlock Text="unsigned" Style="{StaticResource TileLabel}"/>
+                                </StackPanel></Grid>
+                            </Border>
+                            <Border Style="{StaticResource Tile}">
+                                <Grid><Path Style="{StaticResource TileIcon}" Data="{StaticResource IcoFiles}"/><StackPanel>
+                                    <TextBlock x:Name="PortableFoldersText" Text="0" Style="{StaticResource TileValue}"/>
+                                    <TextBlock Text="folders searched" Style="{StaticResource TileLabel}"/>
+                                </StackPanel></Grid>
+                            </Border>
+                            <Border Style="{StaticResource Tile}">
+                                <Grid><Path Style="{StaticResource TileIcon}" Data="{StaticResource IcoClock}"/><StackPanel>
+                                    <TextBlock x:Name="PortableElapsedText" Text="0.0s" Style="{StaticResource TileValue}"/>
+                                    <TextBlock Text="scan time" Style="{StaticResource TileLabel}"/>
+                                </StackPanel></Grid>
+                            </Border>
+                        </UniformGrid>
+                        <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                BorderThickness="1" Padding="16,14" Margin="0,0,0,14">
+                            <StackPanel>
+                                <DockPanel LastChildFill="True" Margin="0,0,0,12">
+                                    <Button x:Name="PortableScanButton" DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Click="OnScanPortable" Margin="10,0,0,0" MinWidth="86" VerticalAlignment="Top">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Style="{StaticResource BtnIcon}" Data="M11,4 A7,7 0 0 1 18,11 A7,7 0 0 1 11,18 A7,7 0 0 1 4,11 A7,7 0 0 1 11,4 Z M16,16 L21,21"/>
+                                            <TextBlock Text="Scan" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button x:Name="PortableCancelButton" DockPanel.Dock="Right" Style="{StaticResource ChromeButton}" Click="OnCancelPortable"
+                                            Content="Cancel" Visibility="Collapsed" Margin="10,0,0,0" VerticalAlignment="Top"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Scan scope" FontSize="14" FontWeight="SemiBold"/>
+                                        <TextBlock Foreground="{DynamicResource Muted}" FontSize="12.5" TextWrapping="Wrap" Margin="0,3,0,0"
+                                                   Text="Find standalone .exe tools that no installer registered. Protected system folders are skipped, junctions are ignored so it can't loop, and every file is checked against the same signature engine the downloader uses."/>
+                                    </StackPanel>
+                                </DockPanel>
+                                <TextBlock FontSize="12.5" Foreground="{DynamicResource Muted}" Margin="0,0,0,10" TextWrapping="Wrap"
+                                           Text="Pick the drives to search for portable apps, or add specific folders. Nothing is scanned until you choose at least one."/>
+                                <WrapPanel>
+                                    <WrapPanel x:Name="PortableDriveBar"/>
+                                    <CheckBox x:Name="PortableAllDrives" Style="{StaticResource PillCheck}" Content="All drives" VerticalAlignment="Top"
+                                              Checked="OnPortableAllDrives" Unchecked="OnPortableAllDrives" Margin="0,0,8,6"/>
+                                    <Button x:Name="PortableAddFolder" Style="{StaticResource ChromeButton}" Padding="10,4"
+                                            Content="Add folder…" Click="OnPortableAddFolder" VerticalAlignment="Top" Margin="0,0,0,6"
+                                            ToolTip="Search one specific folder (and everything inside it)"/>
+                                </WrapPanel>
+                                <WrapPanel x:Name="PortableFolderBar" Margin="0,2,0,0"/>
+                                <TextBlock Text="Always skipped:" FontSize="11.5" Foreground="{DynamicResource Muted}" Margin="0,8,0,4"/>
+                                <WrapPanel x:Name="PortableExcludes"/>
+                                <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
+                                <TextBlock Text="SAVE BACKUPS TO" Style="{StaticResource ColLabel}" Margin="0,0,0,8"/>
+                                <DockPanel LastChildFill="True">
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button x:Name="PortableBackupDestChange" Style="{StaticResource ChromeButton}" Content="Change…"
+                                                Click="OnPortableBackupDestChange" Margin="8,0,0,0"/>
+                                        <Button x:Name="PortableBackupDestReset" Style="{StaticResource ChromeButton}" Content="Use Downloads"
+                                                Click="OnPortableBackupDestReset" Margin="6,0,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="PortableBackupDestText" FontFamily="Cascadia Code, Consolas" FontSize="12"
+                                               Foreground="{DynamicResource Text}" VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </DockPanel>
+                                <CheckBox x:Name="PortableReceiptCheck" Style="{StaticResource PillCheck}" Margin="0,8,0,0" HorizontalAlignment="Left"
+                                          Content="Write a receipt and check every copied file" Checked="OnReceiptToggled" Unchecked="OnReceiptToggled"
+                                          ToolTip="After copying, every file is checked (it's there and the same size) and a receipt listing them is saved in the backup folder."/>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel x:Name="PortableProgressPanel" Visibility="Collapsed" Margin="0,14,0,0">
+                            <TextBlock x:Name="PortableProgressText" FontSize="12.5" Foreground="{DynamicResource Muted}"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <Border CornerRadius="5" Height="8" Background="{DynamicResource Ctl}" Margin="0,8,0,0">
+                                <ProgressBar x:Name="PortableProgressBar" Height="8" IsIndeterminate="True"
+                                             Foreground="{DynamicResource Accent}" Background="Transparent" BorderThickness="0"/>
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock x:Name="PortableEmpty" Foreground="{DynamicResource Dim}" FontSize="13.5" Margin="0,16,0,0"
+                                   TextWrapping="Wrap"
+                                   Text="Click “Scan” to index standalone executables. Read-only, Venquery lists them and checks their signatures, it never runs them."/>
+
+                        <StackPanel x:Name="PortableResultsPanel" Visibility="Collapsed">
+
+                            <DockPanel Margin="0,0,0,10">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button x:Name="PortableSelectAllButton" Style="{StaticResource ChromeButton}"
+                                            Click="OnPortableSelectAll" Content="Select all" Margin="0,0,8,0"/>
+                                    <Button x:Name="ExportChecklistButton" Style="{StaticResource ChromeButton}"
+                                            Click="OnExportChecklist" Margin="0,0,8,0" ToolTip="Save the ticked apps as a checklist">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Data="M12,3 V15 M7,10 L12,15 L17,10 M5,21 H19" Stroke="{DynamicResource Text}"
+                                                  StrokeThickness="1.7" Width="14" Height="14" Stretch="Uniform" Fill="Transparent" Margin="0,0,7,0"/>
+                                            <TextBlock Text="Export" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button x:Name="BackupPortableButton" Style="{StaticResource AccentButton}"
+                                            Click="OnBackupPortableApps" Padding="14,7"
+                                            ToolTip="Copy the ticked apps' folders into a Portable Apps folder (where is set under Save backups to)">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Data="M4,5 H20 V15 H4 Z M12,15 V21 M8,21 H16" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.7"
+                                                  Width="14" Height="14" Stretch="Uniform" Fill="Transparent" Margin="0,0,7,0"/>
+                                            <TextBlock Text="Back up selected" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Background="{DynamicResource Ctl}" BorderBrush="{DynamicResource CtlBd}" BorderThickness="1"
+                                            CornerRadius="5" Padding="9,6" Width="210" VerticalAlignment="Center">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Path Grid.Column="0" Data="M11,4 A7,7 0 0 1 18,11 A7,7 0 0 1 11,18 A7,7 0 0 1 4,11 A7,7 0 0 1 11,4 Z M16.5,16.5 L21,21"
+                                                  Stroke="{DynamicResource Dim}" StrokeThickness="1.7" Width="14" Height="14"
+                                                  Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <Grid Grid.Column="1">
+                                                <TextBlock x:Name="PortableFilterPlaceholder" Text="Filter by name…"
+                                                           Foreground="{DynamicResource Dim}" FontSize="12.5" VerticalAlignment="Center"
+                                                           IsHitTestVisible="False"/>
+                                                <TextBox x:Name="PortableFilterBox" BorderThickness="0" Background="Transparent"
+                                                         Foreground="{DynamicResource Text}" CaretBrush="{DynamicResource Text}"
+                                                         VerticalAlignment="Center" FontSize="12.5" TextChanged="OnPortableFilterChanged"/>
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+                                    <TextBlock Text="Sort" VerticalAlignment="Center" FontSize="12.5"
+                                               Foreground="{DynamicResource Muted}" Margin="14,0,8,0"/>
+                                    <ComboBox x:Name="PortableSortBox" Style="{StaticResource FluentCombo}"
+                                              ItemContainerStyle="{StaticResource FluentComboItem}" Width="130" SelectedIndex="0"
+                                              VerticalAlignment="Center" SelectionChanged="OnPortableSortChanged">
+                                        <ComboBoxItem Content="Name"/>
+                                        <ComboBoxItem Content="Size"/>
+                                        <ComboBoxItem Content="Type (signed)"/>
+                                        <ComboBoxItem Content="Date"/>
+                                    </ComboBox>
+                                    <Button x:Name="PortableSortDir" Style="{StaticResource ChromeButton}" Content="▲ Asc"
+                                            Click="OnPortableSortDir" Margin="8,0,0,0" MinWidth="72"
+                                            ToolTip="Toggle ascending / descending (Date: oldest ↔ newest first)"/>
+                                </StackPanel>
+                            </DockPanel>
+
+                            <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                    BorderThickness="1" Padding="6">
+                                <ItemsControl x:Name="PortableList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="10,8">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="1.5*"/>
+                                                    <ColumnDefinition Width="2*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <CheckBox Grid.Column="0" Style="{StaticResource FluentCheck}" VerticalAlignment="Center"
+                                                          Margin="0,0,12,0"
+                                                          IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                                                           VerticalAlignment="Center" FontFamily="Cascadia Code, Consolas"
+                                                           TextTrimming="CharacterEllipsis" Margin="0,0,12,0" Cursor="Hand"
+                                                           Tag="{Binding FullPath}" MouseLeftButtonUp="OnRevealExe"
+                                                           ToolTip="{Binding FullPath}"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding Folder}" FontSize="12"
+                                                           Foreground="{DynamicResource Muted}" VerticalAlignment="Center"
+                                                           FontFamily="Cascadia Code, Consolas" TextTrimming="CharacterEllipsis" Margin="0,0,12,0"/>
+                                                <TextBlock Grid.Column="3" Text="{Binding SizeText}" FontSize="12"
+                                                           Foreground="{DynamicResource Dim}" VerticalAlignment="Center"
+                                                           FontFamily="Cascadia Code, Consolas" Margin="0,0,12,0"/>
+                                                <Border Grid.Column="4" CornerRadius="12" Padding="8,2" VerticalAlignment="Center"
+                                                        BorderThickness="1">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="{DynamicResource GreenBg}"/>
+                                                            <Setter Property="BorderBrush" Value="{DynamicResource GreenBd}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding SignatureKind}" Value="warn">
+                                                                    <Setter Property="Background" Value="{DynamicResource AmberBg}"/>
+                                                                    <Setter Property="BorderBrush" Value="{DynamicResource AmberBd}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding SignatureText}" FontSize="11.5" TextTrimming="CharacterEllipsis"
+                                                               MaxWidth="220">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Foreground" Value="{DynamicResource Green}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding SignatureKind}" Value="warn">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource Amber}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+
+                            <TextBlock x:Name="PortableTruncatedNote" Visibility="Collapsed" Foreground="{DynamicResource Amber}"
+                                       FontSize="12" Margin="2,8,0,0" TextWrapping="Wrap"
+                                       Text="Showing the first 2000 executables, narrow the scope for a complete list."/>
+
+                            <!-- Copy progress while backing up selected app folders -->
+                            <StackPanel x:Name="PortableBackupProgressPanel" Visibility="Collapsed" Margin="0,16,0,0">
+                                <DockPanel Margin="0,0,0,8">
+                                    <Button x:Name="PortableBackupCancelButton" DockPanel.Dock="Right"
+                                            Style="{StaticResource ChromeButton}" Click="OnCancelPortableBackup" Content="Cancel"/>
+                                    <TextBlock x:Name="PortableCopyProgressText" FontSize="12.5" Foreground="{DynamicResource Muted}"
+                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                </DockPanel>
+                                <Border CornerRadius="5" Height="8" Background="{DynamicResource Ctl}">
+                                    <ProgressBar x:Name="PortableCopyBar" Height="8" Minimum="0" Maximum="100" Value="0"
+                                                 Foreground="{DynamicResource Accent}" Background="Transparent" BorderThickness="0"/>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Backup result -->
+                            <Border x:Name="PortableBackupSavedBar" Visibility="Collapsed" CornerRadius="8" Margin="0,16,0,0"
+                                    Background="{DynamicResource GreenBg}" BorderBrush="{DynamicResource GreenBd}"
+                                    BorderThickness="1" Padding="14,12">
+                                <StackPanel>
+                                    <TextBlock x:Name="PortableBackupSavedText" Foreground="{DynamicResource Green}" FontWeight="SemiBold"
+                                               FontSize="12.5" TextWrapping="Wrap"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <Button Style="{StaticResource ChromeButton}" Click="OnOpenPortableBackupFolder"
+                                                Content="Open folder"/>
+                                    </StackPanel>
+                                    <TextBlock Foreground="{DynamicResource Green}" FontSize="11.5" Margin="0,10,0,0" TextWrapping="Wrap"
+                                               Text="Move this Portable Apps folder to a USB drive for easy restoration on another PC."/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+            <!-- ===== /VIEW: PORTABLE APPS ===== -->
+
+            <!-- ===== VIEW: LOOSE DOCUMENTS ===== -->
+            <Grid x:Name="DocumentsView" Visibility="Collapsed" Background="Transparent">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="30,16,30,30">
+
+                        <UniformGrid Rows="1" Margin="0,0,-12,16" Visibility="{Binding Visibility, ElementName=DocResultsPanel}">
+                            <Border Style="{StaticResource TileHero}">
+                                <Grid><Path Style="{StaticResource TileHeroIcon}" Data="{StaticResource IcoDoc}"/><StackPanel>
+                                    <TextBlock x:Name="DocItemsText" Text="0" Style="{StaticResource TileHeroValue}"/>
+                                    <TextBlock Text="items found" Style="{StaticResource TileHeroLabel}"/>
+                                </StackPanel></Grid>
+                            </Border>
+                            <Border Style="{StaticResource Tile}">
+                                <Grid><Path Style="{StaticResource TileIcon}" Data="{StaticResource IcoDisk}"/><StackPanel>
+                                    <TextBlock x:Name="DocSizeText" Text="0" Style="{StaticResource TileValue}"/>
+                                    <TextBlock Text="total size" Style="{StaticResource TileLabel}"/>
+                                </StackPanel></Grid>
+                            </Border>
+                            <Border Style="{StaticResource Tile}">
+                                <Grid><Path Style="{StaticResource TileIcon}" Data="{StaticResource IcoClock}"/><StackPanel>
+                                    <TextBlock x:Name="DocElapsedText" Text="0.0s" Style="{StaticResource TileValue}"/>
+                                    <TextBlock Text="scan time" Style="{StaticResource TileLabel}"/>
+                                </StackPanel></Grid>
+                            </Border>
+                        </UniformGrid>
+                        <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                BorderThickness="1" Padding="16,14" Margin="0,0,0,14">
+                            <StackPanel>
+                                <DockPanel LastChildFill="True" Margin="0,0,0,12">
+                                    <Button x:Name="DocScanButton" DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Click="OnScanDocuments" Margin="10,0,0,0" MinWidth="86" VerticalAlignment="Top">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Style="{StaticResource BtnIcon}" Data="M11,4 A7,7 0 0 1 18,11 A7,7 0 0 1 11,18 A7,7 0 0 1 4,11 A7,7 0 0 1 11,4 Z M16,16 L21,21"/>
+                                            <TextBlock Text="Scan" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button x:Name="DocScanCancelButton" DockPanel.Dock="Right" Style="{StaticResource ChromeButton}" Click="OnCancelDocScan"
+                                            Content="Cancel" Visibility="Collapsed" Margin="10,0,0,0" VerticalAlignment="Top"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Scan scope" FontSize="14" FontWeight="SemiBold"/>
+                                        <TextBlock Foreground="{DynamicResource Muted}" FontSize="12.5" TextWrapping="Wrap" Margin="0,3,0,0"
+                                                   Text="Finds documents, pictures, media and archives on the drives you pick. The Windows drive covers your Documents, Pictures, Videos, Music, Downloads and Desktop folders (and its root), the stuff a reset would wipe. Folders with no personal content, or that contain a program, are skipped. Tick what matters and back it up."/>
+                                    </StackPanel>
+                                </DockPanel>
+                                <TextBlock FontSize="12.5" Foreground="{DynamicResource Muted}" Margin="0,0,0,10" TextWrapping="Wrap"
+                                           Text="Pick the drives to search, or add specific folders. The Windows drive (C:) means your personal folders plus its root; other drives are searched whole. Nothing is scanned until you choose one."/>
+                                <WrapPanel>
+                                    <WrapPanel x:Name="DocDriveBar"/>
+                                    <CheckBox x:Name="DocAllDrives" Style="{StaticResource PillCheck}" Content="All drives" VerticalAlignment="Top"
+                                              Checked="OnDocAllDrives" Unchecked="OnDocAllDrives" Margin="0,0,8,6"/>
+                                    <Button x:Name="DocAddFolder" Style="{StaticResource ChromeButton}" Padding="10,4"
+                                            Content="Add folder…" Click="OnDocAddFolder" VerticalAlignment="Top" Margin="0,0,0,6"
+                                            ToolTip="Search one specific folder (and everything inside it)"/>
+                                </WrapPanel>
+                                <WrapPanel x:Name="DocFolderBar" Margin="0,2,0,0"/>
+                                <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
+                                <TextBlock Text="CONTENT TYPES" Style="{StaticResource ColLabel}" Margin="0,0,0,8"/>
+                                <WrapPanel>
+                                    <CheckBox x:Name="DocCatDocuments" Style="{StaticResource PillCheck}" Content="Documents" IsChecked="True"
+                                              Checked="OnDocCategoryChanged" Unchecked="OnDocCategoryChanged"/>
+                                    <CheckBox x:Name="DocCatPictures" Style="{StaticResource PillCheck}" Content="Pictures" IsChecked="True"
+                                              Checked="OnDocCategoryChanged" Unchecked="OnDocCategoryChanged"/>
+                                    <CheckBox x:Name="DocCatVideos" Style="{StaticResource PillCheck}" Content="Videos" IsChecked="True"
+                                              Checked="OnDocCategoryChanged" Unchecked="OnDocCategoryChanged"/>
+                                    <CheckBox x:Name="DocCatAudio" Style="{StaticResource PillCheck}" Content="Audio" IsChecked="True"
+                                              Checked="OnDocCategoryChanged" Unchecked="OnDocCategoryChanged"/>
+                                    <CheckBox x:Name="DocCatArchives" Style="{StaticResource PillCheck}" Content="Archives" IsChecked="True"
+                                              Checked="OnDocCategoryChanged" Unchecked="OnDocCategoryChanged"/>
+                                    <CheckBox x:Name="DocCatDiskImages" Style="{StaticResource PillCheck}" Content="Disk images" IsChecked="True"
+                                              ToolTip="ISO, IMG, VHD/VHDX, VMDK, VDI, DMG, WIM... (often several GB each)"
+                                              Checked="OnDocCategoryChanged" Unchecked="OnDocCategoryChanged"/>
+                                </WrapPanel>
+                                <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
+                                <TextBlock Text="SAVE BACKUPS TO" Style="{StaticResource ColLabel}" Margin="0,0,0,8"/>
+                                <DockPanel LastChildFill="True">
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button x:Name="DocBackupDestChange" Style="{StaticResource ChromeButton}" Content="Change…"
+                                                Click="OnDocBackupDestChange" Margin="8,0,0,0"/>
+                                        <Button x:Name="DocBackupDestReset" Style="{StaticResource ChromeButton}" Content="Use Downloads"
+                                                Click="OnDocBackupDestReset" Margin="6,0,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="DocBackupDestText" FontFamily="Cascadia Code, Consolas" FontSize="12"
+                                               Foreground="{DynamicResource Text}" VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </DockPanel>
+                                <CheckBox x:Name="DocReceiptCheck" Style="{StaticResource PillCheck}" Margin="0,8,0,0" HorizontalAlignment="Left"
+                                          Content="Write a receipt and check every copied file" Checked="OnReceiptToggled" Unchecked="OnReceiptToggled"
+                                          ToolTip="After copying, every file is checked (it's there and the same size) and a receipt listing them is saved in the backup folder."/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border CornerRadius="12" Background="{DynamicResource InfoBg}" BorderBrush="{DynamicResource InfoBd}"
+                                BorderThickness="1" Padding="14,12" Margin="0,0,0,14">
+                            <DockPanel>
+                                <Path DockPanel.Dock="Left" Data="M12,2 A10,10 0 0 1 22,12 A10,10 0 0 1 12,22 A10,10 0 0 1 2,12 A10,10 0 0 1 12,2 Z M12,16.5 V11 M12,7.5 H12.01"
+                                      Stroke="{DynamicResource Accent}" StrokeThickness="2.0" Fill="Transparent"
+                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Width="20" Height="20" Stretch="Uniform" VerticalAlignment="Top" Margin="0,1,11,0"/>
+                                <TextBlock Foreground="{DynamicResource Text}" FontSize="12.5" TextWrapping="Wrap">
+                                    <Run Text="Copy only." FontWeight="SemiBold"/>
+                                    <Run Text=" Venquery reads file names and sizes to find your documents, never their contents, and copies the ones you tick into a Portable Documents folder (in Downloads, unless you choose another place under Save backups to). Keep it on a USB drive to stay safe from a reset."/>
+                                </TextBlock>
+                            </DockPanel>
+                        </Border>
+
+                        <StackPanel x:Name="DocProgressPanel" Visibility="Collapsed" Margin="0,0,0,4">
+                            <TextBlock x:Name="DocProgressText" FontSize="12.5" Foreground="{DynamicResource Muted}"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <Border CornerRadius="5" Height="8" Background="{DynamicResource Ctl}" Margin="0,8,0,0">
+                                <ProgressBar x:Name="DocProgressBar" Height="8" IsIndeterminate="True"
+                                             Foreground="{DynamicResource Accent}" Background="Transparent" BorderThickness="0"/>
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock x:Name="DocEmpty" Foreground="{DynamicResource Dim}" FontSize="13.5" Margin="0,6,0,0"
+                                   TextWrapping="Wrap"
+                                   Text="Pick the drive(s) to search above, then click “Scan”. Read-only, nothing is copied until you pick items and back them up."/>
+
+                        <StackPanel x:Name="DocResultsPanel" Visibility="Collapsed">
+
+                            <DockPanel Margin="0,0,0,10">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button x:Name="DocSelectAllButton" Style="{StaticResource ChromeButton}"
+                                            Click="OnDocSelectAll" Content="Select all" Margin="0,0,8,0"/>
+                                    <Button x:Name="BackupDocsButton" Style="{StaticResource AccentButton}"
+                                            Click="OnBackupDocuments" Padding="14,7"
+                                            ToolTip="Copy the ticked items into a Portable Documents folder (where is set under Save backups to)">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Data="M4,5 H20 V15 H4 Z M12,15 V21 M8,21 H16" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.7"
+                                                  Width="14" Height="14" Stretch="Uniform" Fill="Transparent" Margin="0,0,7,0"/>
+                                            <TextBlock Text="Back up selected" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Background="{DynamicResource Ctl}" BorderBrush="{DynamicResource CtlBd}" BorderThickness="1"
+                                            CornerRadius="5" Padding="9,6" Width="210" VerticalAlignment="Center">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Path Grid.Column="0" Data="M11,4 A7,7 0 0 1 18,11 A7,7 0 0 1 11,18 A7,7 0 0 1 4,11 A7,7 0 0 1 11,4 Z M16.5,16.5 L21,21"
+                                                  Stroke="{DynamicResource Dim}" StrokeThickness="1.7" Width="14" Height="14"
+                                                  Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <Grid Grid.Column="1">
+                                                <TextBlock x:Name="DocFilterPlaceholder" Text="Filter by name…"
+                                                           Foreground="{DynamicResource Dim}" FontSize="12.5" VerticalAlignment="Center"
+                                                           IsHitTestVisible="False"/>
+                                                <TextBox x:Name="DocFilterBox" BorderThickness="0" Background="Transparent"
+                                                         Foreground="{DynamicResource Text}" CaretBrush="{DynamicResource Text}"
+                                                         VerticalAlignment="Center" FontSize="12.5" TextChanged="OnDocFilterChanged"/>
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+                                    <TextBlock Text="Sort" VerticalAlignment="Center" FontSize="12.5"
+                                               Foreground="{DynamicResource Muted}" Margin="14,0,8,0"/>
+                                    <ComboBox x:Name="DocSortBox" Style="{StaticResource FluentCombo}"
+                                              ItemContainerStyle="{StaticResource FluentComboItem}" Width="130" SelectedIndex="0"
+                                              VerticalAlignment="Center" SelectionChanged="OnDocSortChanged">
+                                        <ComboBoxItem Content="Name"/>
+                                        <ComboBoxItem Content="Size"/>
+                                        <ComboBoxItem Content="Type"/>
+                                        <ComboBoxItem Content="Date"/>
+                                    </ComboBox>
+                                    <Button x:Name="DocSortDir" Style="{StaticResource ChromeButton}" Content="▲ Asc"
+                                            Click="OnDocSortDir" Margin="8,0,0,0" MinWidth="72"
+                                            ToolTip="Toggle ascending / descending (Date: oldest ↔ newest first)"/>
+                                </StackPanel>
+                            </DockPanel>
+
+                            <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                    BorderThickness="1" Padding="6">
+                                <ItemsControl x:Name="DocList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="10,8">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="1.4*"/>
+                                                    <ColumnDefinition Width="2*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <CheckBox Grid.Column="0" Style="{StaticResource FluentCheck}" VerticalAlignment="Center"
+                                                          Margin="0,0,12,0"
+                                                          IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                                                           VerticalAlignment="Center" FontFamily="Cascadia Code, Consolas"
+                                                           TextTrimming="CharacterEllipsis" Margin="0,0,12,0" Cursor="Hand"
+                                                           Tag="{Binding FullPath}" MouseLeftButtonUp="OnRevealDoc"
+                                                           ToolTip="{Binding FullPath}"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding Detail}" FontSize="12"
+                                                           Foreground="{DynamicResource Muted}" VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis" Margin="0,0,12,0"/>
+                                                <Border Grid.Column="3" CornerRadius="12" Padding="8,2" VerticalAlignment="Center"
+                                                        BorderThickness="1">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="{DynamicResource InfoBg}"/>
+                                                            <Setter Property="BorderBrush" Value="{DynamicResource InfoBd}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding KindKind}" Value="file">
+                                                                    <Setter Property="Background" Value="{DynamicResource Ctl}"/>
+                                                                    <Setter Property="BorderBrush" Value="{DynamicResource CtlBd}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding KindText}" FontSize="11.5" Foreground="{DynamicResource Text}"/>
+                                                </Border>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+
+                            <TextBlock x:Name="DocTruncatedNote" Visibility="Collapsed" Foreground="{DynamicResource Amber}"
+                                       FontSize="12" Margin="2,8,0,0" TextWrapping="Wrap"
+                                       Text="Showing the first 1000 items, narrow the scope for a complete list."/>
+
+                            <StackPanel x:Name="DocBackupProgressPanel" Visibility="Collapsed" Margin="0,16,0,0">
+                                <DockPanel Margin="0,0,0,8">
+                                    <Button x:Name="DocBackupCancelButton" DockPanel.Dock="Right"
+                                            Style="{StaticResource ChromeButton}" Click="OnCancelDocBackup" Content="Cancel"/>
+                                    <TextBlock x:Name="DocCopyProgressText" FontSize="12.5" Foreground="{DynamicResource Muted}"
+                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                </DockPanel>
+                                <Border CornerRadius="5" Height="8" Background="{DynamicResource Ctl}">
+                                    <ProgressBar x:Name="DocCopyBar" Height="8" Minimum="0" Maximum="100" Value="0"
+                                                 Foreground="{DynamicResource Accent}" Background="Transparent" BorderThickness="0"/>
+                                </Border>
+                            </StackPanel>
+
+                            <Border x:Name="DocBackupSavedBar" Visibility="Collapsed" CornerRadius="8" Margin="0,16,0,0"
+                                    Background="{DynamicResource GreenBg}" BorderBrush="{DynamicResource GreenBd}"
+                                    BorderThickness="1" Padding="14,12">
+                                <StackPanel>
+                                    <TextBlock x:Name="DocBackupSavedText" Foreground="{DynamicResource Green}" FontWeight="SemiBold"
+                                               FontSize="12.5" TextWrapping="Wrap"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <Button Style="{StaticResource ChromeButton}" Click="OnOpenDocBackupFolder"
+                                                Content="Open folder"/>
+                                    </StackPanel>
+                                    <TextBlock Foreground="{DynamicResource Green}" FontSize="11.5" Margin="0,10,0,0" TextWrapping="Wrap"
+                                               Text="Move this Portable Documents folder to a USB drive to keep it safe from a reset."/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+            <!-- ===== /VIEW: LOOSE DOCUMENTS ===== -->
+            <!-- Host for the Organize page (every edition), filled by InitOrganizer (MainWindow.Organizer.cs). -->
+            <ContentControl x:Name="OrganizerHost" Visibility="Collapsed" Background="Transparent"/>
+
+            <!-- Host for the Pro Tools page. Injected at runtime (InitProTools) in editions built with
+                 PROTOOLS; empty otherwise (Legacy). -->
+            <ContentControl x:Name="ProToolsHost" Visibility="Collapsed" Background="Transparent"/>
+
+            <!-- ===== VIEW: SYSTEM HEALTH ===== -->
+            <Grid x:Name="HealthView" Visibility="Collapsed" Background="Transparent">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <!-- Mockup C layout: tiles, a 3-column grid of cards, then the two repair cards side by side.
+                         Refresh lives in the page header (HeaderRefresh); this one stays for the code, hidden. -->
+                    <StackPanel Margin="30,16,30,30">
+                        <Button x:Name="HealthRefreshButton" Visibility="Collapsed" Click="OnRefreshHealth"/>
+                        <!-- Summary tiles (real readings only; a tile is left out when Windows doesn't report it). -->
+                        <UniformGrid Rows="1" x:Name="HealthTiles" Visibility="Collapsed" Margin="0,0,-12,18"/>
+
+                        <Border x:Name="HealthSummaryCard" Visibility="Collapsed">
+                            <TextBlock x:Name="HealthSummary"/>
+                        </Border>
+
+                        <StackPanel x:Name="HealthProgressPanel" Visibility="Collapsed" Margin="0,4,0,0">
+                            <TextBlock Text="Reading system health…" FontSize="12.5" Foreground="{DynamicResource Muted}"/>
+                            <Border CornerRadius="5" Height="8" Background="{DynamicResource Ctl}" Margin="0,8,0,0">
+                                <ProgressBar Height="8" IsIndeterminate="True" Foreground="{DynamicResource Accent}"
+                                             Background="Transparent" BorderThickness="0"/>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Storage / Free space / Memory / Battery / Stability / Uptime cards (RenderHealth). -->
+                        <UniformGrid x:Name="HealthContent" Columns="3" Margin="0,0,-14,0"/>
+
+                        <!-- ===== Guarded maintenance (restore point + SFC/DISM), shared across every edition =====
+                             Venquery only WRITES these scripts. Running one is the user's action, gated by the
+                             confirm dialog, the Windows UAC prompt, and the script's own typed-Y. -->
+                        <UniformGrid Columns="2" Margin="0,0,-14,0">
+                            <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                    BorderThickness="1" Padding="16,14" Margin="0,0,14,14">
+                                <DockPanel>
+                                    <Path DockPanel.Dock="Left" Data="{StaticResource IcoBackupAll}" Style="{StaticResource NavIcon}"
+                                          Stroke="{DynamicResource Text}" Width="18" Height="18" VerticalAlignment="Top" Margin="0,2,12,0"/>
+                                    <Button x:Name="RpGenerateButton" DockPanel.Dock="Right" Style="{StaticResource ChromeButton}"
+                                            VerticalAlignment="Top" Margin="12,0,0,0" Click="OnGenerateRestorePoint"
+                                            ToolTip="Write the restore-point script (nothing runs yet)">
+                                        <TextBlock Text="Generate"/>
+                                    </Button>
+                                    <StackPanel>
+                                        <TextBlock Text="Create a restore point" FontSize="13.5" FontWeight="SemiBold"/>
+                                        <TextBlock Text="A safety net before changes" FontSize="12" Foreground="{DynamicResource Muted}" Margin="0,2,0,0"/>
+                                        <TextBlock FontSize="11.5" Foreground="{DynamicResource Dim}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                                   Text="Venquery writes a short script that turns on System Protection for C: and creates a System Restore point, so you can roll Windows back. Nothing runs until you review it and type Y as Administrator."/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                            <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                    BorderThickness="1" Padding="16,14" Margin="0,0,14,14">
+                                <DockPanel>
+                                    <Path DockPanel.Dock="Left" Data="{StaticResource IcoToolbox}" Style="{StaticResource NavIcon}"
+                                          Stroke="{DynamicResource Text}" Width="18" Height="18" VerticalAlignment="Top" Margin="0,2,12,0"/>
+                                    <Button x:Name="SfcGenerateButton" DockPanel.Dock="Right" Style="{StaticResource ChromeButton}"
+                                            VerticalAlignment="Top" Margin="12,0,0,0" Click="OnGenerateSfcDism"
+                                            ToolTip="Write the repair script (nothing runs yet)">
+                                        <TextBlock Text="Generate"/>
+                                    </Button>
+                                    <StackPanel>
+                                        <TextBlock Text="System file repair (SFC + DISM)" FontSize="13.5" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Windows' own repair tools" FontSize="12" Foreground="{DynamicResource Muted}" Margin="0,2,0,0"/>
+                                        <TextBlock FontSize="11.5" Foreground="{DynamicResource Dim}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                                   Text="Repairs corrupt Windows system files: a short, readable script that runs Windows' own DISM /RestoreHealth then sfc /scannow. Nothing runs when you generate it, you review it and run it, and it still asks you to type Y as Administrator first."/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- The Run buttons live inside these bars, which stay hidden until a script has been generated,
+                             so "Run" is never available until the script exists. -->
+                        <Border x:Name="RpSavedBar" Visibility="Collapsed" CornerRadius="10" Margin="0,0,0,12"
+                                Background="{DynamicResource GreenBg}" BorderBrush="{DynamicResource GreenBd}" BorderThickness="1" Padding="14,12">
+                            <StackPanel>
+                                <TextBlock x:Name="RpSavedText" Foreground="{DynamicResource Green}" FontWeight="SemiBold"
+                                           FontSize="12.5" TextWrapping="Wrap"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <Button Style="{StaticResource ChromeButton}" Click="OnOpenRpScript"
+                                            Content="Open script" Margin="0,0,8,0" ToolTip="Read the script before running it"/>
+                                    <Button Style="{StaticResource ChromeButton}" Click="OnOpenRpFolder"
+                                            Content="Open folder" Margin="0,0,8,0"/>
+                                    <Button Style="{StaticResource ChromeButton}" Click="OnCopyRpRunCommand"
+                                            Content="Copy run command" Margin="0,0,8,0"/>
+                                    <Button x:Name="RpRunButton" Style="{StaticResource AccentButton}" Click="OnRunRpScript"
+                                            Padding="14,7" ToolTip="Open the script in an elevated PowerShell and start it (it still asks you to confirm)">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Data="M6,4 L18,12 L6,20 Z" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Width="12" Height="12"
+                                                  Stretch="Uniform" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Run script" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <Border CornerRadius="8" Background="{DynamicResource Ctl}" BorderBrush="{DynamicResource CtlBd}"
+                                        BorderThickness="1" Padding="10,7" Margin="0,10,0,0">
+                                    <TextBox x:Name="RpRunCommandBox" IsReadOnly="True" BorderThickness="0" Background="Transparent"
+                                             Foreground="{DynamicResource Text}" CaretBrush="{DynamicResource Text}"
+                                             FontFamily="Cascadia Code, Consolas" FontSize="11.5" TextWrapping="Wrap"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="SfcSavedBar" Visibility="Collapsed" CornerRadius="10" Margin="0,0,0,12"
+                                Background="{DynamicResource GreenBg}" BorderBrush="{DynamicResource GreenBd}" BorderThickness="1" Padding="14,12">
+                            <StackPanel>
+                                <TextBlock x:Name="SfcSavedText" Foreground="{DynamicResource Green}" FontWeight="SemiBold"
+                                           FontSize="12.5" TextWrapping="Wrap"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <Button Style="{StaticResource ChromeButton}" Click="OnOpenSfcScript"
+                                            Content="Open script" Margin="0,0,8,0" ToolTip="Read the script before running it"/>
+                                    <Button Style="{StaticResource ChromeButton}" Click="OnOpenSfcFolder"
+                                            Content="Open folder" Margin="0,0,8,0"/>
+                                    <Button Style="{StaticResource ChromeButton}" Click="OnCopySfcRunCommand"
+                                            Content="Copy run command" Margin="0,0,8,0"/>
+                                    <Button x:Name="SfcRunButton" Style="{StaticResource AccentButton}" Click="OnRunSfcScript"
+                                            Padding="14,7" ToolTip="Open the script in an elevated PowerShell and start it (it still asks you to confirm)">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Data="M6,4 L18,12 L6,20 Z" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Width="12" Height="12"
+                                                  Stretch="Uniform" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Run script" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Foreground="{DynamicResource Green}" FontSize="11.5" Margin="0,11,0,0" TextWrapping="Wrap"
+                                           Text="“Run script” opens it elevated and starts it, it still waits for a typed Y. Or copy this to run it from your own Administrator terminal:"/>
+                                <Border CornerRadius="8" Background="{DynamicResource Ctl}" BorderBrush="{DynamicResource CtlBd}"
+                                        BorderThickness="1" Padding="10,7" Margin="0,6,0,0">
+                                    <TextBox x:Name="SfcRunCommandBox" IsReadOnly="True" BorderThickness="0" Background="Transparent"
+                                             Foreground="{DynamicResource Text}" CaretBrush="{DynamicResource Text}"
+                                             FontFamily="Cascadia Code, Consolas" FontSize="11.5" TextWrapping="Wrap"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock x:Name="HealthNote" Foreground="{DynamicResource Dim}" FontSize="11.5" TextWrapping="Wrap"
+                                   Margin="0,6,0,0" Visibility="Collapsed"
+                                   Text="Read-only: everything here comes straight from Windows' own data and nothing is changed; add it to a shareable file with Export (top right). “Healthy / Warning” is Windows' own drive status, it flags a drive that is failing or predicted to fail, but it isn't a wear grade. The detailed wear, temperature and power-on hours come from the drive's SMART data, which some drives only expose to an administrator, so they may read “not reported”."/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+            <!-- ===== /VIEW: SYSTEM HEALTH ===== -->
+
+
+            <!-- ===== VIEW: STARTUP & TASKS ===== -->
+            <Grid x:Name="StartupView" Visibility="Collapsed" Background="Transparent">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="30,16,30,30">
+                        <UniformGrid Rows="1" x:Name="StartupTiles" Visibility="Collapsed" Margin="0,0,-12,16"/>
+                        <DockPanel Margin="0,0,0,18">
+                            <Button x:Name="StartupRefreshButton" DockPanel.Dock="Right" Style="{StaticResource ChromeButton}"
+                                    Click="OnRefreshStartup" VerticalAlignment="Top" Visibility="Collapsed">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="M4,11 A7,7 0 1 1 6,16 M4,11 V6 M4,11 H9" Stroke="{DynamicResource Text}"
+                                          StrokeThickness="1.7" Width="15" Height="15" Stretch="Uniform" Fill="Transparent"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" Margin="0,0,7,0"/>
+                                    <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <TextBlock Foreground="{DynamicResource Muted}" FontSize="13" TextWrapping="Wrap" MaxWidth="680"
+                                       HorizontalAlignment="Left" VerticalAlignment="Center"
+                                       Text="What runs at startup, and your scheduled tasks. Both can be turned on or off: each change asks you to confirm, only flips the on/off state (the same switch Task Manager uses) and never deletes anything, so it's fully reversible. Items set up for everyone on this PC need administrator approval (UAC); your own don't."/>
+                        </DockPanel>
+
+                        <StackPanel x:Name="StartupProgressPanel" Visibility="Collapsed" Margin="0,4,0,0">
+                            <TextBlock Text="Reading startup items and scheduled tasks…" FontSize="12.5" Foreground="{DynamicResource Muted}"/>
+                            <Border CornerRadius="5" Height="8" Background="{DynamicResource Ctl}" Margin="0,8,0,0">
+                                <ProgressBar Height="8" IsIndeterminate="True" Foreground="{DynamicResource Accent}"
+                                             Background="Transparent" BorderThickness="0"/>
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock Text="STARTUP PROGRAMS" Style="{StaticResource ColLabel}" Margin="0,6,0,8"/>
+                        <StackPanel x:Name="StartupList"/>
+
+                        <DockPanel Margin="0,26,0,8" LastChildFill="False">
+                            <TextBlock DockPanel.Dock="Left" Text="SCHEDULED TASKS" Style="{StaticResource ColLabel}" VerticalAlignment="Center"/>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                <CheckBox x:Name="ShowMsTasksCheck" Style="{StaticResource FluentCheck}" VerticalAlignment="Center"
+                                          Click="OnToggleShowMsTasks"/>
+                                <TextBlock VerticalAlignment="Center" Margin="9,0,0,0" FontSize="12.5"
+                                           Foreground="{DynamicResource Muted}" Text="Show Windows (Microsoft) tasks"/>
+                            </StackPanel>
+                        </DockPanel>
+                        <StackPanel x:Name="TaskList"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+            <!-- ===== /VIEW: STARTUP & TASKS ===== -->
+
+            <!-- ===== VIEW: SETTINGS ===== -->
+            <Grid x:Name="SettingsView" Visibility="Collapsed" Background="Transparent">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="30,16,30,30" MaxWidth="760" HorizontalAlignment="Left">
+
+                        <TextBlock Text="APPEARANCE" Style="{StaticResource ColLabel}" Margin="0,0,0,8"/>
+                        <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                BorderThickness="1" Padding="16,14" Margin="0,0,0,20">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Theme" VerticalAlignment="Center"
+                                               FontSize="13.5" FontWeight="SemiBold"/>
+                                    <ComboBox x:Name="ThemeSelector" Grid.Column="1" HorizontalAlignment="Left" MinWidth="260"
+                                              Style="{StaticResource FluentCombo}" ItemContainerStyle="{StaticResource FluentComboItem}"
+                                              SelectionChanged="OnThemeSelected">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Ellipse Width="13" Height="13" Fill="{Binding Swatch}" VerticalAlignment="Center"
+                                                             Stroke="{DynamicResource CtlBd}" StrokeThickness="1" Margin="0,0,10,0"/>
+                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </Grid>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Muted}" FontSize="12.5" Margin="0,10,0,0"
+                                           Text="Choose a built-in colour theme. The light / dark button in the title bar quickly flips between the last light and dark theme you used."/>
+
+                                <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Margin="0,16,0,0"/>
+                                <Grid Margin="0,16,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Layout" VerticalAlignment="Center"
+                                               FontSize="13.5" FontWeight="SemiBold"/>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <CheckBox x:Name="NavRightToggle" Style="{StaticResource FluentCheck}" VerticalAlignment="Center"
+                                                  Checked="OnNavSideToggled" Unchecked="OnNavSideToggled"/>
+                                        <TextBlock VerticalAlignment="Center" Margin="9,0,0,0" FontSize="13" Foreground="{DynamicResource Muted}"
+                                                   Text="Left-hand mode, put the navigation rail on the right side"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Margin="0,16,0,0"/>
+                                <Grid Margin="0,16,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Background" VerticalAlignment="Center"
+                                               FontSize="13.5" FontWeight="SemiBold"/>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button Style="{StaticResource ChromeButton}" Click="OnChooseBackground"
+                                                Content="Choose image…" Margin="0,0,8,0"/>
+                                        <Button x:Name="ClearBgButton" Style="{StaticResource ChromeButton}"
+                                                Click="OnClearBackground" Content="Clear" Visibility="Collapsed"/>
+                                    </StackPanel>
+                                </Grid>
+                                <TextBlock x:Name="BgFileText" Foreground="{DynamicResource Muted}" FontSize="12"
+                                           Margin="130,6,0,0" TextTrimming="CharacterEllipsis" Visibility="Collapsed"/>
+                                <StackPanel x:Name="BgOpacityRow" Orientation="Horizontal" Margin="130,10,0,0" Visibility="Collapsed">
+                                    <TextBlock Text="Opacity" VerticalAlignment="Center" Foreground="{DynamicResource Muted}"
+                                               FontSize="12.5" Width="64"/>
+                                    <Slider x:Name="BgOpacitySlider" Width="210" Minimum="0.1" Maximum="0.9" Value="0.35"
+                                            VerticalAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="0.05"
+                                            ValueChanged="OnBgOpacityChanged"/>
+                                    <TextBlock x:Name="BgOpacityValue" VerticalAlignment="Center" Foreground="{DynamicResource Dim}"
+                                               FontSize="12" Margin="10,0,0,0" Width="42"/>
+                                </StackPanel>
+                                <TextBlock Foreground="{DynamicResource Dim}" FontSize="11.5" TextWrapping="Wrap" Margin="0,10,0,0"
+                                           Text="Your image is copied into a Themes folder next to Venquery and shown behind the content, cards stay solid so text is readable. PNG, JPG, BMP or GIF."/>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="BACKUP &amp; RESTORE" Style="{StaticResource ColLabel}" Margin="0,0,0,8"/>
+                        <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                                BorderThickness="1" Padding="16,14" Margin="0,0,0,20">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox x:Name="CrossMachineToggle" Style="{StaticResource FluentCheck}"
+                                              VerticalAlignment="Center" Click="OnCrossMachineToggle"/>
+                                    <TextBlock Text="Allow restoring a backup on a different PC model"
+                                               VerticalAlignment="Center" Margin="11,0,0,0" FontSize="13.5" FontWeight="SemiBold"/>
+                                </StackPanel>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Muted}" FontSize="12.5" Margin="31,8,0,0"
+                                           Text="Off (recommended): a backup only restores on the PC that made it. Restoring one machine's apps onto a different model can pull in software that conflicts with this PC's drivers or hardware. Turn this on only if you deliberately want a backup that restores on another computer, it applies to backups you create while it's on; existing backups keep the setting they were made with."/>
+                                <Border x:Name="CrossMachineWarn" Visibility="Collapsed" CornerRadius="6" Margin="31,12,0,0"
+                                        Background="{DynamicResource AmberBg}" BorderBrush="{DynamicResource AmberBd}"
+                                        BorderThickness="1" Padding="11,8">
+                                    <TextBlock Foreground="{DynamicResource Amber}" FontSize="12" TextWrapping="Wrap"
+                                               Text="⚠ Cross-PC restore is ON. New backups you save can be restored on any PC model, use with care."/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Foreground="{DynamicResource Dim}" FontSize="11.5" TextWrapping="Wrap"
+                                   Text="Theme and window size are remembered automatically. Your last view and portable-scan scope are also restored on launch."/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+            <!-- ===== /VIEW: SETTINGS ===== -->
+
+            </Grid>
+            <!-- ===== /CONTENT HOST ===== -->
+
+                <!-- ================= GLOBAL TASK BAND (any page) ================= -->
+                <Border x:Name="GlobalProgressPanel" Grid.Row="2" Visibility="Collapsed" Margin="16,0,16,12"
+                        CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}"
+                        BorderThickness="1" Padding="16,11">
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,8">
+                            <TextBlock x:Name="GlobalProgressPercent" DockPanel.Dock="Right" Style="{StaticResource Mono}"
+                                       FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource Accent}" Text=""/>
+                            <TextBlock x:Name="GlobalProgressText" Style="{StaticResource Mono}" FontSize="12.5"
+                                       Foreground="{DynamicResource Text}" TextTrimming="CharacterEllipsis" Text=""/>
+                        </DockPanel>
+                        <Border CornerRadius="5" Height="10" Background="{DynamicResource Ctl}">
+                            <ProgressBar x:Name="GlobalProgressBar" Style="{StaticResource TaskBar}" Height="10" Value="0"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- ================= FOOTER (Devices & Drivers only) ================= -->
+                <Border x:Name="FooterBar" Grid.Row="3" Margin="16,0,16,14" CornerRadius="12"
+                        Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1"
+                        Padding="12,10">
+                    <DockPanel>
+                        <Button x:Name="ScanButton" DockPanel.Dock="Left" Style="{StaticResource ChromeButton}" Click="OnScanClick">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Style="{StaticResource BtnIcon}" Data="M20,12 A8,8 0 1 1 17.7,6.4 M20,4 V9 H15"/>
+                                <TextBlock Text="Rescan" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
+                            <CheckBox x:Name="OlderVersionsToggle" Style="{StaticResource FluentCheck}" Click="OnOlderVersionsToggle"
+                                      VerticalAlignment="Center"/>
+                            <TextBlock Text="Show older drivers" Foreground="{DynamicResource Muted}" FontSize="13"
+                                       VerticalAlignment="Center" Margin="9,0,0,0"/>
+                        </StackPanel>
+
+                        <Button x:Name="DownloadButton" DockPanel.Dock="Right" Style="{StaticResource AccentButton}"
+                                Click="OnDownloadClick" IsEnabled="False">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Style="{StaticResource BtnIcon}" Data="{StaticResource IcoUpdate}"/>
+                                <TextBlock x:Name="DownloadLabel" Text="Download selected" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,14,0">
+                            <TextBlock Text="Saving to " Foreground="{DynamicResource Dim}" FontSize="12.5" VerticalAlignment="Center"/>
+                            <Border CornerRadius="4" Background="{DynamicResource Ctl}" BorderBrush="{DynamicResource CtlBd}"
+                                    BorderThickness="1" Padding="8,2">
+                                <TextBlock x:Name="DownloadsPathRun" Style="{StaticResource Mono}" FontSize="12"
+                                           Foreground="{DynamicResource Muted}" Text="Downloads"/>
+                            </Border>
+                        </StackPanel>
+                        <Grid/>
+                    </DockPanel>
+                </Border>
+            </Grid>
+            </Border>
+            <!-- ===== /CONTENT LAYER ===== -->
+        </Grid>
+
+        <!-- ================= LOG FLYOUT ================= -->
+        <Popup x:Name="LogPopup" Placement="Bottom" PlacementTarget="{Binding ElementName=ViewLogButton}"
+               AllowsTransparency="True" StaysOpen="False" HorizontalOffset="-320" VerticalOffset="6">
+            <Border Background="{DynamicResource Pane2}" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1"
+                    CornerRadius="9" Width="470">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="28" ShadowDepth="6" Opacity="0.5" Color="Black"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" Margin="14,9">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button x:Name="CopyLogButton" Style="{StaticResource ChromeButton}" Content="Copy" Click="OnCopyLog" Padding="9,4"
+                                    ToolTip="Copy what's shown here to the clipboard"/>
+                            <Button x:Name="SaveLogButton" Style="{StaticResource ChromeButton}" Content="Save" Click="OnSaveLog" Padding="9,4" Margin="6,0,0,0"
+                                    ToolTip="Save this session's full log next to your reports (SystemReports)"/>
+                            <Button x:Name="LogsFolderButton" Style="{StaticResource ChromeButton}" Content="Logs folder" Click="OnOpenLogsFolder" Padding="9,4" Margin="6,0,0,0"
+                                    ToolTip="Open the folder with the last 10 session logs and any crash logs"/>
+                        </StackPanel>
+                        <TextBlock Text="Log" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <Border Grid.Row="1" BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0">
+                        <TextBox x:Name="LogBox" IsReadOnly="True" BorderThickness="0" Background="Transparent"
+                                 Foreground="{DynamicResource Muted}" FontFamily="Cascadia Code, Consolas" FontSize="11.5"
+                                 Padding="14,10" MaxHeight="320" VerticalScrollBarVisibility="Auto" TextWrapping="NoWrap"/>
+                    </Border>
+                </Grid>
+            </Border>
+        </Popup>
+    </Grid>
+</Window>

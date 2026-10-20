@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="Venquery.Controls.RestoreView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Restore from a Venquery backup (Backup & Restore page, "Restore from a backup" tab). Engine:
+         Services/RestoreService.cs. Copies only add files; apps/drivers use the backup's own guarded scripts. -->
+    <StackPanel>
+        <DockPanel Margin="0,0,0,18" LastChildFill="True">
+            <Button x:Name="RestoreButton" DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Content="Restore..." Click="OnRestore"
+                    VerticalAlignment="Top" IsEnabled="False"/>
+            <StackPanel>
+                <TextBlock Foreground="{DynamicResource Muted}" FontSize="13" TextWrapping="Wrap" MaxWidth="600" HorizontalAlignment="Left" Margin="0,0,0,0"
+                           Text="Bring a Venquery backup back onto this PC: a Prepare for Reset backup, or a Portable Apps / Portable Documents backup. Pick what to restore, then press Restore."/>
+            </StackPanel>
+        </DockPanel>
+
+        <Border CornerRadius="10" Background="{DynamicResource InfoBg}" BorderBrush="{DynamicResource InfoBd}" BorderThickness="1" Padding="14,12" Margin="0,0,0,20">
+            <TextBlock Foreground="{DynamicResource Text}" FontSize="12.5" TextWrapping="Wrap">
+                <Run Text="Nothing is overwritten." FontWeight="SemiBold"/>
+                <Run Text=" Files are copied back into a dated &quot;Restored from backup&quot; folder, and a name that's taken becomes name (2). Apps and drivers are restored by the backup's own scripts, which show what they'll do and wait for you to type Y; the driver script also checks it's the same PC."/>
+            </TextBlock>
+        </Border>
+
+        <TextBlock Text="BACKUP" Style="{StaticResource ColLabel}" Margin="0,0,0,8"/>
+        <Border CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1" Padding="13,12" Margin="0,0,0,14">
+            <StackPanel>
+                <DockPanel LastChildFill="True">
+                    <Button x:Name="ChooseBackupButton" DockPanel.Dock="Right" Style="{StaticResource ChromeButton}" Content="Choose backup folder..."
+                            Click="OnChooseBackup" Margin="8,0,0,0"/>
+                    <TextBlock x:Name="BackupPathText" FontFamily="Cascadia Code, Consolas" FontSize="12.5" Foreground="{DynamicResource Text}"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Text="No backup chosen yet."/>
+                </DockPanel>
+                <TextBlock x:Name="FoundLabel" Text="Backups found on this PC:" FontSize="11.5" Foreground="{DynamicResource Muted}" Margin="0,10,0,6" Visibility="Collapsed"/>
+                <WrapPanel x:Name="FoundBar"/>
+            </StackPanel>
+        </Border>
+
+        <TextBlock x:Name="PartsLabel" Text="WHAT TO RESTORE" Style="{StaticResource ColLabel}" Margin="0,0,0,8" Visibility="Collapsed"/>
+        <StackPanel x:Name="PartsPanel"/>
+
+        <TextBlock x:Name="RunLabel" Text="PROGRESS" Style="{StaticResource ColLabel}" Margin="0,14,0,8" Visibility="Collapsed"/>
+        <Border x:Name="RunCard" Visibility="Collapsed" CornerRadius="12" Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1">
+            <TextBox x:Name="RunLog" IsReadOnly="True" BorderThickness="0" Background="Transparent" Foreground="{DynamicResource Muted}"
+                     FontFamily="Cascadia Code, Consolas" FontSize="11.5" Padding="12,10" MaxHeight="260" TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"/>
+        </Border>
+    </StackPanel>
+</UserControl>

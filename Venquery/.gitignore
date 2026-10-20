@@ -1,0 +1,29 @@
+# ---- Build output ----
+[Bb]in/
+[Oo]bj/
+publish/
+
+# ---- Portable / packaged builds (large binaries — ship these via GitHub Releases, not git) ----
+Portable/
+OpenDriverPortable/
+*.exe
+
+# ---- Visual Studio / Rider / VS Code ----
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userprefs
+
+# ---- Local settings & logs ----
+*.log
+
+# ---- OS cruft ----
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ---- Keep these tracked (they are source, not build output) ----
+!venquery.ico
+!definitions.json

@@ -1,0 +1,13 @@
+# Normalize line endings; let git decide text vs binary automatically.
+* text=auto
+
+# Windows-specific sources keep CRLF on checkout.
+*.cs   text eol=crlf
+*.xaml text eol=crlf
+*.csproj text eol=crlf
+
+# Binary assets — never touch line endings.
+*.ico binary
+*.png binary
+*.jpg binary
+*.exe binary

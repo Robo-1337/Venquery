@@ -1,0 +1,780 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-07-23",
+  "manifestUrl": null,
+
+  "_comment": "CURATED DATABASE — every entry was checked against the manufacturer's own current support/download page (or, for GPUs, TechPowerUp, a stable and widely trusted driver mirror). A device is listed ONLY when a real, verifiable, official driver or control-software page exists for it; generic USB hubs, host/root controllers, and Windows in-box devices are deliberately left out. DIRECT DOWNLOADS that never go stale come from two fields: 'resolver' names a live lookup run every scan (e.g. 'nvidia-geforce' queries NVIDIA for the current Game Ready driver), and 'directDownload' is a vendor-maintained 'always latest' installer URL the vendor keeps pointed at the newest build (Intel DSA, SteelSeries GG, Razer Synapse). Per-version file URLs are otherwise NOT hardcoded (they rot within weeks) — those entries point at the vendor's stable support/drivers page. 'manifestUrl' can host an updated copy of this whole file for automatic refresh. Ordering matters: for a vendor with both a class-specific (pnpClass) entry and a general one, the class-specific entry must come FIRST so it wins for that class.",
+
+  "devices": [
+
+
+    {
+      "label": "NVIDIA GeForce GPUs",
+      "bus": "PCI",
+      "ven": "10DE",
+      "dev": null,
+      "pnpClass": "Display",
+      "domain": "nvidia.com",
+      "supportPage": "https://www.nvidia.com/en-us/geforce/drivers/",
+      "resolver": "nvidia-geforce",
+      "versions": [],
+      "optional": [
+        {
+          "name": "NVIDIA App",
+          "note": "NVIDIA's official driver manager, settings, and recording",
+          "url": "https://www.nvidia.com/en-us/software/nvidia-app/"
+        },
+        {
+          "name": "All driver versions (TechPowerUp)",
+          "note": "Trusted mirror archive of every NVIDIA GeForce driver",
+          "url": "https://www.techpowerup.com/download/nvidia-geforce-graphics-drivers/"
+        }
+      ]
+    },
+
+    {
+      "label": "AMD Radeon GPUs",
+      "bus": "PCI",
+      "ven": "1002",
+      "dev": null,
+      "pnpClass": "Display",
+      "domain": "amd.com",
+      "supportPage": "https://www.amd.com/en/support/download/drivers.html",
+      "referer": "https://www.amd.com/",
+      "versions": [],
+      "optional": [
+        {
+          "name": "AMD Software: Adrenalin Edition",
+          "note": "AMD's official driver + settings suite (auto-detects your GPU)",
+          "url": "https://www.amd.com/en/products/software/adrenalin.html"
+        },
+        {
+          "name": "All driver versions (TechPowerUp)",
+          "note": "Trusted mirror archive of every AMD Radeon driver",
+          "url": "https://www.techpowerup.com/download/amd-radeon-graphics-drivers/"
+        }
+      ]
+    },
+
+    {
+      "label": "Intel Arc / integrated graphics",
+      "bus": "PCI",
+      "ven": "8086",
+      "dev": null,
+      "pnpClass": "Display",
+      "domain": "intel.com",
+      "supportPage": "https://www.intel.com/content/www/us/en/products/details/discrete-gpus/arc/software.html",
+      "directDownload": {
+        "label": "Intel Driver & Support Assistant",
+        "url": "https://dsadata.intel.com/installer",
+        "note": "Official Intel installer — always latest; detects and updates Intel graphics"
+      },
+      "versions": [],
+      "optional": [
+        {
+          "name": "Intel Driver & Support Assistant",
+          "note": "Intel's own official scanner",
+          "url": "https://www.intel.com/content/www/us/en/support/detect.html"
+        },
+        {
+          "name": "All driver versions (TechPowerUp)",
+          "note": "Trusted mirror archive of every Intel graphics driver",
+          "url": "https://www.techpowerup.com/download/intel-graphics-drivers/"
+        }
+      ]
+    },
+
+    {
+      "label": "Intel Wireless Bluetooth",
+      "bus": "PCI",
+      "ven": "8086",
+      "dev": null,
+      "pnpClass": "Bluetooth",
+      "domain": "intel.com",
+      "supportPage": "https://www.intel.com/content/www/us/en/download-center/home.html",
+      "directDownload": {
+        "label": "Intel Driver & Support Assistant",
+        "url": "https://dsadata.intel.com/installer",
+        "note": "Official Intel installer — always latest; detects and updates Intel Bluetooth"
+      },
+      "versions": [],
+      "optional": [
+        {
+          "name": "All driver versions (TechPowerUp)",
+          "note": "Trusted mirror archive of every Intel Bluetooth driver",
+          "url": "https://www.techpowerup.com/download/intel-wireless-bluetooth-drivers/"
+        }
+      ]
+    },
+
+    {
+      "label": "Intel Wi-Fi / Ethernet networking",
+      "bus": "PCI",
+      "ven": "8086",
+      "dev": null,
+      "pnpClass": "Net",
+      "domain": "intel.com",
+      "supportPage": "https://www.intel.com/content/www/us/en/download-center/home.html",
+      "directDownload": {
+        "label": "Intel Driver & Support Assistant",
+        "url": "https://dsadata.intel.com/installer",
+        "note": "Official Intel installer — always latest; detects and updates Intel network adapters"
+      },
+      "versions": [],
+      "optional": [
+        {
+          "name": "Intel Wi-Fi driver archive (TechPowerUp)",
+          "note": "All Intel Wi-Fi adapter driver versions",
+          "url": "https://www.techpowerup.com/download/intel-wireless-networking-wifi-adapter-drivers/"
+        },
+        {
+          "name": "Intel Ethernet driver archive (TechPowerUp)",
+          "note": "All Intel wired-LAN driver versions",
+          "url": "https://www.techpowerup.com/download/intel-ethernet-networking-drivers/"
+        }
+      ]
+    },
+
+
+    {
+      "label": "AMD chipset (AM4 / AM5 platform)",
+      "bus": "PCI",
+      "ven": "1022",
+      "dev": null,
+      "domain": "amd.com",
+      "supportPage": "https://www.amd.com/en/support/download/drivers.html",
+      "referer": "https://www.amd.com/",
+      "versions": [],
+      "optional": [
+        {
+          "name": "AMD Ryzen Master",
+          "note": "Official CPU monitoring and tuning utility",
+          "url": "https://www.amd.com/en/products/software/ryzen-master.html"
+        },
+        {
+          "name": "All chipset versions (TechPowerUp)",
+          "note": "Trusted mirror archive of every AMD Ryzen chipset driver",
+          "url": "https://www.techpowerup.com/download/amd-ryzen-chipset-drivers/"
+        }
+      ]
+    },
+
+    {
+      "label": "Intel devices (chipset / NPU / other)",
+      "bus": "PCI",
+      "ven": "8086",
+      "dev": null,
+      "domain": "intel.com",
+      "supportPage": "https://www.intel.com/content/www/us/en/download-center/home.html",
+      "directDownload": {
+        "label": "Intel Driver & Support Assistant",
+        "url": "https://dsadata.intel.com/installer",
+        "note": "Official Intel installer — always latest; detects and updates Intel chipset/NPU drivers"
+      },
+      "versions": [],
+      "optional": [
+        {
+          "name": "Intel Driver & Support Assistant",
+          "note": "Intel's own official scanner — identifies and updates Intel components",
+          "url": "https://www.intel.com/content/www/us/en/support/detect.html"
+        },
+        {
+          "name": "Intel NPU driver archive (TechPowerUp)",
+          "note": "All Intel AI Boost / NPU driver versions (Core Ultra)",
+          "url": "https://www.techpowerup.com/download/intel-npu-drivers/"
+        }
+      ]
+    },
+
+
+    {
+      "label": "Realtek PCIe devices (audio / LAN)",
+      "bus": "PCI",
+      "ven": "10EC",
+      "dev": null,
+      "domain": "realtek.com",
+      "supportPage": "https://www.realtek.com/Download/List?cate_id=584",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Creative Sound Blaster",
+      "bus": "PCI",
+      "ven": "1102",
+      "dev": null,
+      "domain": "creative.com",
+      "supportPage": "https://support.creative.com/Downloads/searchdownloads.aspx",
+      "versions": [],
+      "optional": []
+    },
+
+
+    {
+      "label": "MediaTek Wi-Fi / Bluetooth",
+      "bus": "PCI",
+      "ven": "14C3",
+      "dev": null,
+      "domain": "mediatek.com",
+      "supportPage": "https://www.mediatek.com/products/broadband-wifi",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Qualcomm Atheros Wi-Fi / Bluetooth",
+      "bus": "PCI",
+      "ven": "168C",
+      "dev": null,
+      "domain": "qualcomm.com",
+      "supportPage": "https://www.qualcomm.com/support",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Broadcom network devices",
+      "bus": "PCI",
+      "ven": "14E4",
+      "dev": null,
+      "domain": "broadcom.com",
+      "supportPage": "https://www.broadcom.com/support/download-search",
+      "versions": [],
+      "optional": []
+    },
+
+
+    {
+      "label": "Samsung NVMe SSDs",
+      "bus": "PCI",
+      "ven": "144D",
+      "dev": null,
+      "domain": "semiconductor.samsung.com",
+      "supportPage": "https://semiconductor.samsung.com/consumer-storage/support/tools/",
+      "versions": [],
+      "optional": [
+        {
+          "name": "Samsung Magician",
+          "note": "Official SSD health, firmware updates, performance tuning",
+          "url": "https://semiconductor.samsung.com/consumer-storage/magician/"
+        }
+      ]
+    },
+
+    {
+      "label": "Western Digital / SanDisk NVMe SSDs",
+      "bus": "PCI",
+      "ven": "15B7",
+      "dev": null,
+      "domain": "sandisk.com",
+      "supportPage": "https://support-en.sandisk.com/app/products/downloads/softwaredownloads",
+      "versions": [],
+      "optional": [
+        {
+          "name": "SanDisk Dashboard (WD Dashboard successor)",
+          "note": "Official SSD health, firmware updates",
+          "url": "https://support-en.sandisk.com/app/answers/detailweb/a_id/31759"
+        }
+      ]
+    },
+
+    {
+      "label": "Crucial / Micron NVMe SSDs",
+      "bus": "PCI",
+      "ven": "1344",
+      "dev": null,
+      "domain": "crucial.com",
+      "supportPage": "https://www.crucial.com/support/storage-executive",
+      "versions": [],
+      "optional": [
+        {
+          "name": "Crucial Storage Executive",
+          "note": "Official SSD firmware updates, health monitoring",
+          "url": "https://www.crucial.com/support/storage-executive"
+        }
+      ]
+    },
+
+    {
+      "label": "SK hynix NVMe SSDs",
+      "bus": "PCI",
+      "ven": "1C5C",
+      "dev": null,
+      "domain": "skhynix.com",
+      "supportPage": "https://ssd.skhynix.com/download/",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Kingston / FURY NVMe SSDs",
+      "bus": "PCI",
+      "ven": "2646",
+      "dev": null,
+      "domain": "kingston.com",
+      "supportPage": "https://www.kingston.com/en/support",
+      "versions": [],
+      "optional": [
+        {
+          "name": "Kingston SSD Manager",
+          "note": "Official SSD health monitoring and firmware updates",
+          "url": "https://www.kingston.com/en/support/technical/ssdmanager"
+        }
+      ]
+    },
+
+
+    {
+      "label": "Realtek USB audio / network",
+      "bus": "USB",
+      "ven": "0BDA",
+      "dev": null,
+      "domain": "realtek.com",
+      "supportPage": "https://www.realtek.com/Download/List?cate_id=595",
+      "versions": [],
+      "optional": [
+        {
+          "name": "Realtek Audio Console",
+          "note": "Speaker/mic configuration and effects (Microsoft Store)",
+          "url": "https://apps.microsoft.com/detail/9p2b8mcsvpln"
+        }
+      ]
+    },
+
+    {
+      "label": "Focusrite / Novation audio interfaces",
+      "bus": "USB",
+      "ven": "1235",
+      "dev": null,
+      "domain": "focusrite.com",
+      "supportPage": "https://downloads.focusrite.com/focusrite",
+      "versions": [],
+      "optional": []
+    },
+
+
+    {
+      "label": "Logitech devices",
+      "bus": "USB",
+      "ven": "046D",
+      "dev": null,
+      "domain": "logitech.com",
+      "supportPage": "https://www.logitech.com/en-us/support",
+      "versions": [],
+      "optional": [
+        {
+          "name": "Logitech G HUB",
+          "note": "For Logitech G gaming mice/keyboards/headsets — lighting, DPI, macros",
+          "url": "https://www.logitechg.com/en-us/software/ghub"
+        },
+        {
+          "name": "Logi Options+",
+          "note": "For non-gaming Logitech mice/keyboards/webcams — button and gesture customization",
+          "url": "https://www.logitech.com/en-us/software/logi-options-plus.html"
+        }
+      ]
+    },
+
+    {
+      "label": "Razer devices",
+      "bus": "USB",
+      "ven": "1532",
+      "dev": null,
+      "domain": "razer.com",
+      "supportPage": "https://www.razer.com/synapse-4",
+      "directDownload": {
+        "label": "Razer Synapse 4",
+        "url": "https://rzr.to/synapse-4-pc-download",
+        "note": "Official Razer Synapse installer — always latest; drivers, lighting, and macros"
+      },
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Corsair devices",
+      "bus": "USB",
+      "ven": "1B1C",
+      "dev": null,
+      "domain": "corsair.com",
+      "supportPage": "https://www.corsair.com/us/en/s/downloads",
+      "versions": [],
+      "optional": [
+        {
+          "name": "Corsair iCUE",
+          "note": "Lighting, fan/pump curves, and macros for Corsair peripherals and coolers",
+          "url": "https://www.corsair.com/us/en/explorer/icue/"
+        }
+      ]
+    },
+
+    {
+      "label": "SteelSeries devices",
+      "bus": "USB",
+      "ven": "1038",
+      "dev": null,
+      "domain": "steelseries.com",
+      "supportPage": "https://steelseries.com/gg/download",
+      "directDownload": {
+        "label": "SteelSeries GG",
+        "url": "https://steelseries.com/gg/downloads/gg/latest/windows",
+        "note": "Official SteelSeries GG suite — always latest; drivers, lighting, and audio"
+      },
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Elgato devices",
+      "bus": "USB",
+      "ven": "0FD9",
+      "dev": null,
+      "domain": "elgato.com",
+      "supportPage": "https://www.elgato.com/ww/en/s/downloads",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Gigabyte / AORUS peripherals",
+      "bus": "USB",
+      "ven": "0414",
+      "dev": null,
+      "domain": "gigabyte.com",
+      "supportPage": "https://www.gigabyte.com/Support/Consumer/Download",
+      "versions": [],
+      "optional": [
+        {
+          "name": "GIGABYTE Control Center",
+          "note": "Lighting, macros, and tuning for GIGABYTE/AORUS peripherals",
+          "url": "https://www.gigabyte.com/Consumer/Software/GIGABYTE-Control-Center/global/"
+        }
+      ]
+    },
+
+    {
+      "label": "ASUS devices (peripherals / Wi-Fi / docks)",
+      "bus": "USB",
+      "ven": "0B05",
+      "dev": null,
+      "domain": "asus.com",
+      "supportPage": "https://www.asus.com/support/download-center/",
+      "versions": [],
+      "optional": [
+        {
+          "name": "Armoury Crate",
+          "note": "For ROG/TUF peripherals — lighting, macros, device settings",
+          "url": "https://www.asus.com/support/download-center/armoury-crate/"
+        }
+      ]
+    },
+
+    {
+      "label": "MSI devices (peripherals / docks)",
+      "bus": "USB",
+      "ven": "1462",
+      "dev": null,
+      "domain": "msi.com",
+      "supportPage": "https://www.msi.com/support/download",
+      "versions": [],
+      "optional": [
+        {
+          "name": "MSI Center",
+          "note": "For MSI peripherals and systems — lighting, macros, tuning",
+          "url": "https://www.msi.com/support/download/MSI-Center"
+        }
+      ]
+    },
+
+    {
+      "label": "Cherry keyboards / mice",
+      "bus": "USB",
+      "ven": "046A",
+      "dev": null,
+      "domain": "cherry.de",
+      "supportPage": "https://www.cherry.de/en-us/downloads",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Cooler Master peripherals",
+      "bus": "USB",
+      "ven": "2516",
+      "dev": null,
+      "domain": "coolermaster.com",
+      "supportPage": "https://www.coolermaster.com/downloads/",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Turtle Beach headsets",
+      "bus": "USB",
+      "ven": "10F5",
+      "dev": null,
+      "domain": "turtlebeach.com",
+      "supportPage": "https://support.turtlebeach.com/s/downloads",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "ROCCAT peripherals",
+      "bus": "USB",
+      "ven": "1E7D",
+      "dev": null,
+      "domain": "roccat.com",
+      "supportPage": "https://support.roccat.com/s/software-downloads",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "A4Tech peripherals",
+      "bus": "USB",
+      "ven": "09DA",
+      "dev": null,
+      "domain": "a4tech.com",
+      "supportPage": "https://www.a4tech.com/download.aspx",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Mad Catz / Saitek controllers",
+      "bus": "USB",
+      "ven": "0738",
+      "dev": null,
+      "domain": "madcatz.com",
+      "supportPage": "https://www.madcatz.com/en/Support/Downloads",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Wooting keyboards",
+      "bus": "USB",
+      "ven": "31E3",
+      "dev": null,
+      "domain": "wooting.io",
+      "supportPage": "https://wooting.io/wootility",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Thrustmaster wheels / joysticks",
+      "bus": "USB",
+      "ven": "044F",
+      "dev": null,
+      "domain": "thrustmaster.com",
+      "supportPage": "https://support.thrustmaster.com/en/",
+      "versions": [],
+      "optional": []
+    },
+
+
+    {
+      "label": "NZXT devices",
+      "bus": "USB",
+      "ven": "1E71",
+      "dev": null,
+      "domain": "nzxt.com",
+      "supportPage": "https://nzxt.com/en-US/software/cam",
+      "versions": [],
+      "optional": [
+        {
+          "name": "NZXT CAM",
+          "note": "Monitoring, fan/pump control, and lighting for NZXT hardware",
+          "url": "https://nzxt.com/en-US/software/cam"
+        }
+      ]
+    },
+
+    {
+      "label": "Thermaltake devices",
+      "bus": "USB",
+      "ven": "264A",
+      "dev": null,
+      "domain": "thermaltake.com",
+      "supportPage": "https://www.thermaltake.com/downloads",
+      "versions": [],
+      "optional": [
+        {
+          "name": "TT RGB Plus",
+          "note": "Lighting and monitoring for Thermaltake RGB hardware",
+          "url": "https://www.thermaltake.com/downloads"
+        }
+      ]
+    },
+
+
+    {
+      "label": "AVerMedia capture / tuner",
+      "bus": "USB",
+      "ven": "07CA",
+      "dev": null,
+      "domain": "avermedia.com",
+      "supportPage": "https://www.avermedia.com/support/download",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Hauppauge TV tuners",
+      "bus": "USB",
+      "ven": "2040",
+      "dev": null,
+      "domain": "hauppauge.com",
+      "supportPage": "https://www.hauppauge.com/pages/support/support_usb.html",
+      "versions": [],
+      "optional": []
+    },
+
+
+    {
+      "label": "TP-Link Wi-Fi / Bluetooth adapters",
+      "bus": "USB",
+      "ven": "2357",
+      "dev": null,
+      "domain": "tp-link.com",
+      "supportPage": "https://www.tp-link.com/us/support/download/",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "D-Link adapters",
+      "bus": "USB",
+      "ven": "2001",
+      "dev": null,
+      "domain": "dlink.com",
+      "supportPage": "https://www.dlink.com/en/hq-download-center",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Netgear adapters",
+      "bus": "USB",
+      "ven": "0846",
+      "dev": null,
+      "domain": "netgear.com",
+      "supportPage": "https://www.netgear.com/support/download/",
+      "versions": [],
+      "optional": []
+    },
+
+
+    {
+      "label": "Seagate external drives",
+      "bus": "USB",
+      "ven": "0BC2",
+      "dev": null,
+      "domain": "seagate.com",
+      "supportPage": "https://www.seagate.com/support/downloads/",
+      "versions": [],
+      "optional": [
+        {
+          "name": "Seagate Toolkit",
+          "note": "Backup, sync, and status/LED management for Seagate drives",
+          "url": "https://www.seagate.com/support/software/toolkit/"
+        }
+      ]
+    },
+
+    {
+      "label": "ADATA / XPG storage",
+      "bus": "USB",
+      "ven": "125F",
+      "dev": null,
+      "domain": "adata.com",
+      "supportPage": "https://www.adata.com/en/support/downloads/",
+      "versions": [],
+      "optional": [
+        {
+          "name": "ADATA SSD ToolBox",
+          "note": "Health monitoring and firmware updates for ADATA/XPG SSDs",
+          "url": "https://www.xpg.com/us/ssdtoolbox"
+        }
+      ]
+    },
+
+
+    {
+      "label": "Valve Index / SteamVR",
+      "bus": "USB",
+      "ven": "28DE",
+      "dev": null,
+      "domain": "steampowered.com",
+      "supportPage": "https://store.steampowered.com/app/250820/SteamVR/",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "HTC Vive",
+      "bus": "USB",
+      "ven": "0BB4",
+      "dev": null,
+      "domain": "vive.com",
+      "supportPage": "https://www.vive.com/us/setup/",
+      "versions": [],
+      "optional": []
+    },
+
+    {
+      "label": "Meta Quest (Rift / Link)",
+      "bus": "USB",
+      "ven": "2833",
+      "dev": null,
+      "domain": "meta.com",
+      "supportPage": "https://www.meta.com/quest/setup/",
+      "versions": [],
+      "optional": []
+    }
+  ],
+
+  "vendorFallbacks": [
+    { "ven": "1AF4", "name": "Red Hat / VirtIO", "domain": "fedoraproject.org", "supportPage": "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/" },
+    { "ven": "15AD", "name": "VMware", "domain": "vmware.com", "supportPage": "https://knowledge.broadcom.com/external/article?legacyId=1014294" },
+    { "ven": "1D6B", "name": "Linux Foundation (USB root)", "domain": "kernel.org", "supportPage": "https://www.kernel.org/" }
+  ],
+
+  "systemVendors": [
+    { "aliases": ["ASUSTeK", "ASUS"], "domain": "asus.com", "supportPage": "https://www.asus.com/support/download-center/" },
+    { "aliases": ["Micro-Star", "MSI"], "domain": "msi.com", "supportPage": "https://www.msi.com/support/download" },
+    { "aliases": ["Gigabyte", "GIGABYTE", "AORUS"], "domain": "gigabyte.com", "supportPage": "https://www.gigabyte.com/Support/Consumer/Download" },
+    { "aliases": ["ASRock"], "domain": "asrock.com", "supportPage": "https://www.asrock.com/support/index.asp?cat=Drivers" },
+    { "aliases": ["Biostar"], "domain": "biostar.com.tw", "supportPage": "https://www.biostar.com.tw/app/en/support/download.php" },
+    { "aliases": ["EVGA"], "domain": "evga.com", "supportPage": "https://www.evga.com/support/download/" },
+    { "aliases": ["Dell", "Alienware"], "domain": "dell.com", "supportPage": "https://www.dell.com/support/home/en-us?app=drivers" },
+    { "aliases": ["HP", "Hewlett-Packard", "HP Inc"], "domain": "hp.com", "supportPage": "https://support.hp.com/us-en/drivers" },
+    { "aliases": ["Lenovo", "LENOVO"], "domain": "lenovo.com", "supportPage": "https://pcsupport.lenovo.com/us/en" },
+    { "aliases": ["Acer", "Gateway", "Predator"], "domain": "acer.com", "supportPage": "https://www.acer.com/us-en/support/drivers-and-manuals" },
+    { "aliases": ["Framework"], "domain": "frame.work", "supportPage": "https://knowledgebase.frame.work/bios-and-drivers-downloads-rJ3PaCexh" },
+    { "aliases": ["Razer"], "domain": "razer.com", "supportPage": "https://mysupport.razer.com/" },
+    { "aliases": ["Microsoft Corporation"], "domain": "microsoft.com", "supportPage": "https://support.microsoft.com/en-us/surface/drivers-firmware/download-drivers-and-firmware-for-surface" },
+    { "aliases": ["SAMSUNG ELECTRONICS", "Samsung"], "domain": "samsung.com", "supportPage": "https://www.samsung.com/us/support/downloads/" },
+    { "aliases": ["LG Electronics", "LGE"], "domain": "lg.com", "supportPage": "https://www.lg.com/us/support" },
+
+    { "aliases": ["CLEVO", "Clevo", "TongFang", "TONGFANG", "Notebook", "Standard"], "domain": "clevo.com.tw", "supportPage": "https://www.clevo.com.tw/en/e-services/download/default.asp" },
+    { "aliases": ["System76"], "domain": "system76.com", "supportPage": "https://system76.com/support/" },
+    { "aliases": ["Eluktronics"], "domain": "eluktronics.com", "supportPage": "https://www.eluktronics.com/driver-downloads" },
+    { "aliases": ["SCHENKER", "Schenker", "XMG"], "domain": "schenker-tech.de", "supportPage": "https://download.schenker-tech.de/" },
+    { "aliases": ["Metabox"], "domain": "metabox.com.au", "supportPage": "https://www.metabox.com.au/drivers.asp" },
+    { "aliases": ["MECHREVO"], "domain": "mechrevo.com", "supportPage": "https://www.mechrevo.com/en/downloads" },
+    { "aliases": ["TUXEDO"], "domain": "tuxedocomputers.com", "supportPage": "https://www.tuxedocomputers.com/en/Downloads-Drivers.tuxedo" },
+    { "aliases": ["Maingear"], "domain": "maingear.com", "supportPage": "https://help.maingear.com/category/71-drivers" },
+    { "aliases": ["Origin PC"], "domain": "originpc.com", "supportPage": "https://support.originpc.com/" },
+    { "aliases": ["MEDION"], "domain": "medion.com", "supportPage": "https://www.medion.com/downloads/" },
+    { "aliases": ["Dynabook", "TOSHIBA"], "domain": "dynabook.com", "supportPage": "https://support.dynabook.com/drivers" },
+    { "aliases": ["VAIO", "Sony Corporation"], "domain": "vaio.com", "supportPage": "https://us.vaio.com/pages/support" },
+    { "aliases": ["HUAWEI"], "domain": "huawei.com", "supportPage": "https://consumer.huawei.com/en/support/driver-list/" },
+    { "aliases": ["FUJITSU"], "domain": "fujitsu.com", "supportPage": "https://global.fujitsu/en-us/support" },
+    { "aliases": ["Panasonic"], "domain": "panasonic.com", "supportPage": "https://global-pc-support.connect.panasonic.com/driver" },
+    { "aliases": ["Getac"], "domain": "getac.com", "supportPage": "https://us.getac.com/page-support/drivers2" },
+    { "aliases": ["Durabook", "TWINHEAD"], "domain": "durabook.com", "supportPage": "https://www.durabook.com/en/support/downloads/" }
+  ]
+}
