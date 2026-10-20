@@ -1,0 +1,85 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ===================== VENQUERY LEGACY EDITION =====================
+       .NET Framework 4.8 build for Windows 7 / 8.1 (the .NET 8 editions can't run there). This is a
+       SEPARATE project that REUSES the one source tree by LINKING the shared .cs/.xaml files from
+       ..\Venquery (no copy, that's what the multi-edition refactor removed) and excluding the
+       parts that don't apply on Win7/8.1: winget Backup, the Repair Kit and the CLI report.
+       Modern C# features used by the shared code are enabled via <LangVersion> + Polyfills.cs. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Venquery</RootNamespace>
+    <AssemblyName>Venquery Legacy</AssemblyName>
+    <Product>Venquery Legacy</Product>
+    <Description>Venquery Legacy, transparent driver scanner and downloader for Windows 7/8.1. Finds official driver sources. Never installs anything.</Description>
+    <Version>1.4.2</Version>
+    <Authors>Venquery</Authors>
+    <ApplicationIcon>..\Venquery\venquery.ico</ApplicationIcon>
+    <ApplicationManifest>..\Venquery\app.manifest</ApplicationManifest>
+    <DefineConstants>$(DefineConstants);LEGACY;EDITION_LEGACY</DefineConstants>
+    <!-- Some shared files use file-scoped namespaces / records / ranges, all compiler features that
+         work on net48 with the polyfills in Polyfills.cs. -->
+  </PropertyGroup>
+
+  <!-- Link the shared source (compiled here, edited once in ..\Venquery). Polyfills.cs lives in
+       this folder and is picked up by the default compile glob. -->
+  <ItemGroup>
+    <Compile Include="..\Venquery\**\*.cs"
+             Exclude="..\Venquery\obj\**\*.cs;..\Venquery\bin\**\*.cs"
+             Link="shared\%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- Features that don't exist / don't apply on the Legacy edition. -->
+    <Compile Remove="..\Venquery\Services\WingetService.cs" />
+    <Compile Remove="..\Venquery\Services\ProToolsService.cs" />
+    <Compile Remove="..\Venquery\Services\HeadlessReport.cs" />
+    <!-- Cli.cs stays: it gives Legacy the version/help commands too; the health/report commands (CLI-gated)
+         just print a short notice since the CLI constant isn't defined here. -->
+    <Compile Remove="..\Venquery\MainWindow.ProTools.cs" />
+    <!-- Prepare-for-Reset wizard uses winget/driver export (not on Win7), excluded; its launcher is hidden. -->
+    <Compile Remove="..\Venquery\ResetWizard.xaml.cs" />
+    <Compile Remove="..\Venquery\Controls\ProToolsView.xaml.cs" />
+    <!-- Restore lives on the Backup & Restore page, which Legacy doesn't have. -->
+    <Compile Remove="..\Venquery\Controls\RestoreView.xaml.cs" />
+  </ItemGroup>
+
+  <!-- Link the shared XAML. App.xaml is the application definition; the rest are Pages. Repair Kit
+       XAML is excluded (their code-behind isn't compiled here). -->
+  <ItemGroup>
+    <!-- XAML is linked at its ORIGINAL relative path so BAML resource URIs match, e.g. App.xaml's
+         StartupUri="MainWindow.xaml" must find mainwindow.baml at the assembly root. Listed explicitly
+         (a `..\**` glob mis-computes %(RecursiveDir)); the Repair Kit control is intentionally
+         omitted (their code-behind isn't compiled on Legacy). -->
+    <ApplicationDefinition Include="..\Venquery\App.xaml" Link="App.xaml" />
+    <Page Include="..\Venquery\MainWindow.xaml" Link="MainWindow.xaml" />
+    <Page Include="..\Venquery\ExportDialog.xaml" Link="ExportDialog.xaml" />
+    <!-- Showcase is a general feature (every edition, including Legacy): its window XAML must be listed too. -->
+    <Page Include="..\Venquery\Controls\ShowcaseWindow.xaml" Link="Controls\ShowcaseWindow.xaml" />
+    <!-- The Organize page (File Organizer) is in every edition, Legacy included (file system only). -->
+    <Page Include="..\Venquery\Controls\OrganizerView.xaml" Link="Controls\OrganizerView.xaml" />
+    <Page Include="..\Venquery\Controls\WuDriversWindow.xaml" Link="Controls\WuDriversWindow.xaml" />
+  </ItemGroup>
+
+  <!-- Branding assets (same names the shared code loads via pack URIs) + the driver database. -->
+  <ItemGroup>
+    <Resource Include="..\Venquery\venquery.ico" Link="venquery.ico" />
+    <Resource Include="..\Venquery\venquery.png" Link="venquery.png" />
+    <None Include="..\Venquery\definitions.json" Link="definitions.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- System.Text.Json is used by AppSettings/DefinitionStore/DriverResolver; ships as a NuGet on net48.
+       System.Management (WMI) and System.Net.Http aren't in the default net48 reference set. -->
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Management" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+</Project>

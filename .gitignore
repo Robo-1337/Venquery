@@ -1,0 +1,15 @@
+# Build output
+bin/
+obj/
+dist/
+test-output/
+*.user
+*.suo
+.vs/
+.vscode/
+*.binlog
+
+# OS clutter
+Thumbs.db
+desktop.ini
+.DS_Store
