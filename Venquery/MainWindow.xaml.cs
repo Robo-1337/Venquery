@@ -508,12 +508,31 @@ public partial class MainWindow : Window
             var groups = new List<(Definition? def, VendorFallback? fb, List<ScannedDevice> hw)>();
             var groupIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
+            // Parts built by a chip/ODM maker that doesn't publish public drivers (a laptop's Chicony webcam, a codec)
+            // get their driver from the PC maker. On a recognised OEM system (laptop or prebuilt) that covers every
+            // part; on a DIY motherboard only parts ON the board (PCI, audio), since the board maker didn't build a
+            // USB webcam someone plugged in.
+            var oemSystem = systemIdentity is not null ? _definitions.MatchSystemVendor(systemIdentity.Manufacturer) : null;
+            bool RoutesToOem(ScannedDevice d) => oemSystem is not null
+                && (systemIdentity!.Category == "System" || !string.Equals(d.Bus, "USB", StringComparison.OrdinalIgnoreCase));
+
             foreach (var hw in devices)
             {
                 var (def, fb) = _definitions.Match(hw);
+                if (def is null && fb is null && oemSystem is { } maker && RoutesToOem(hw) && _definitions.MatchOemPart(hw) is { } part)
+                {
+                    fb = new VendorFallback
+                    {
+                        Ven = hw.Vendor,
+                        Name = $"{part.Maker} part for {ShortMaker(systemIdentity!.Manufacturer)}",
+                        Domain = maker.Domain,
+                        SupportPage = maker.SupportPage,
+                        OemChipMaker = part.Maker,
+                    };
+                }
                 if (def is null && fb is null) { _unmatched.Add(hw); continue; }
 
-                var key = def is not null ? $"D:{def.Label}" : $"F:{fb!.Name}";
+                var key = def is not null ? $"D:{def.Label}" : fb!.IsOemRoute ? $"O:{hw.Bus}|{hw.Vendor}" : $"F:{fb!.Name}";
                 if (groupIndex.TryGetValue(key, out var idx)) groups[idx].hw.Add(hw);
                 else { groupIndex[key] = groups.Count; groups.Add((def, fb, new List<ScannedDevice> { hw })); }
             }
@@ -530,6 +549,12 @@ public partial class MainWindow : Window
                 {
                     ShowOlderVersions = OlderVersionsToggle.IsChecked == true,
                 };
+                // The card maker's own tool (GPU Tweak, Afterburner...) joins the optional software. Not on laptops:
+                // there the SUBSYS ID is the laptop maker's, and its desktop card tools don't apply.
+                if (def is not null && systemIdentity?.IsLaptop != true)
+                    foreach (var t in _definitions.PartnerToolsFor(representative))
+                        if (!row.OptionalTools.Any(o => string.Equals(o.Url, t.Url, StringComparison.OrdinalIgnoreCase)))
+                            row.OptionalTools.Add(t);
                 row.PropertyChanged += OnRowChanged;
                 if (row.StatusKind == "update" && row.HasDirectUrl && preCheckedUrls.Add(row.DirectUrl))
                 {
@@ -629,6 +654,18 @@ public partial class MainWindow : Window
 
         // Laptop OEM guidance, for the device classes where the PC maker's own,
         // validated driver is usually preferable to a generic vendor one.
+        // A part routed to the PC maker says so plainly: who made the chip and why the driver comes from the PC maker.
+        if (has && row!.Fallback is { IsOemRoute: true } route)
+        {
+            var maker = ShortMaker(_oem.Maker.Length > 0 ? _oem.Maker : route.Name);
+            OemGuidanceText.Text =
+                $"{route.OemChipMaker} made this part for {maker}, and its driver comes from {maker}, tuned for this PC. " +
+                $"Get it from {route.Domain}.";
+            OemGuidanceBar.Tag = route.SupportPage;
+            OemGuidanceBar.Visibility = Visibility.Visible;
+            return;
+        }
+
         var showOem = has && _oem.IsLaptop && !string.IsNullOrEmpty(_oem.Support)
             && row!.Category is "Display" or "Net" or "Bluetooth" or "Media" or "Image" or "Camera";
         OemGuidanceBar.Visibility = showOem ? Visibility.Visible : Visibility.Collapsed;

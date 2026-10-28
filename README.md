@@ -5,7 +5,7 @@
 <h1 align="center">Venquery</h1>
 
 <p align="center">
-  <b>Drivers, backups, files and PC health for Windows, utilizing existing windows functionality in one simple app for easy use.</b><br>
+  <b>Drivers, backups, files and PC health for Windows, in one calm little app.</b><br>
   Built only on Windows' own tools. Nothing installs, runs or moves without you saying so.
 </p>
 
@@ -35,7 +35,13 @@ Two promises shape everything it does:
 ## Features
 
 ### Devices & Drivers
-- Scans your hardware and matches each device to its manufacturer's **official** driver source.
+- Scans your hardware and matches each device to its manufacturer's **official** driver source: about 140
+  brands of graphics, network, storage, audio, input, controllers, capture, docks, printers and scanners.
+- Parts made by a chip company that doesn't publish drivers (a laptop's webcam or audio codec) point to your
+  PC maker's support page instead. Generic chip IDs shared by countless products are never claimed, so a device
+  is never shown under the wrong brand.
+- A graphics card built by a board partner (ASUS, MSI, GIGABYTE, Sapphire...) also lists that maker's own
+  tuning tool as optional software; the driver still comes from NVIDIA or AMD.
 - Shows the newest driver it can verify, and warns when a GPU is on a legacy driver branch (so you don't
   grab a driver your card can't run).
 - Downloads come straight from the vendor over HTTPS, then get a SHA-256 hash and an Authenticode signature

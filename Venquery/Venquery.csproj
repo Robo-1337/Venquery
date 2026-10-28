@@ -10,7 +10,7 @@
     <AssemblyName>Venquery</AssemblyName>
     <Product>Venquery</Product>
     <Description>Venquery, a Windows toolkit for drivers, backups, files and PC health. Uses only Windows' own tools. Never installs anything on its own.</Description>
-    <Version>1.4.2</Version>
+    <Version>1.5.0</Version>
     <Authors>Venquery</Authors>
     <ApplicationIcon>venquery.ico</ApplicationIcon>
     <!-- Per-Monitor V2 DPI awareness (see app.manifest) so the UI stays crisp on scaled monitors. -->

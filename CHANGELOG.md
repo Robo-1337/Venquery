@@ -2,6 +2,31 @@
 
 All notable changes to Venquery are listed here. Versions follow [Semantic Versioning](https://semver.org).
 
+## 1.5.0
+
+Much better device identification, and a driver database that's checked, dated and guarded by tests.
+
+**Devices & Drivers**
+- About 90 more brands recognised (about 140 in all) across graphics, network, storage, audio, input,
+  controllers, capture, docks, printers and scanners, plus more PC makers (Minisforum, Beelink, CHUWI,
+  Supermicro, Steam Deck, AYANEO). Every entry is dated and checked against the public PCI / USB ID registries.
+- Devices that were missed now show up: Intel Bluetooth, audio on the HD Audio and Intel Smart Sound buses, and
+  the HDMI / DisplayPort audio of NVIDIA, AMD and Intel graphics.
+- Precise matching: exact device, then board/subsystem, then device type, then vendor, whatever the file order.
+  Shared vendor IDs only match listed models, and generic chip IDs are never claimed, so a device is never
+  shown under the wrong brand.
+- Parts whose chip maker publishes no drivers (a laptop's webcam or audio codec) point to your PC maker's
+  support page.
+- A board partner's own graphics card tool (ASUS, MSI, GIGABYTE, EVGA, Palit, PNY, GALAX, Sapphire) is listed as
+  optional software. The driver still comes from NVIDIA or AMD. Not shown on laptops.
+- Links fixed: ROCCAT now points to Turtle Beach, new pages for Cooler Master, Thermaltake, Intel graphics,
+  MSI Center and Clevo; VMware links point to Broadcom.
+- Printers and USB-serial adapters are scanned.
+
+**For contributors**
+- New tests guard the database: no conflicting entries, HTTPS only, links on the vendor's own site, nothing
+  claiming a generic ID, every entry dated with its evidence.
+
 ## 1.4.2 (first public release)
 
 Venquery and Venquery Legacy are now open source. This release includes everything below.

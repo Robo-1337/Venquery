@@ -24,6 +24,11 @@ public sealed class DefinitionStore
     public Manifest Manifest { get; private set; } = new();
     public string Source { get; private set; } = "none";
 
+    public DefinitionStore() { }
+
+    /// <summary>A store over a given manifest (tests exercise the match rules without the shipping file).</summary>
+    internal DefinitionStore(Manifest manifest) { Manifest = manifest; Source = "test"; }
+
     private static string BundledPath =>
         Path.Combine(AppContext.BaseDirectory, "definitions.json");
 
@@ -81,33 +86,57 @@ public sealed class DefinitionStore
         log?.Report($"> definitions ready · source: {Source} · updated {Manifest.Updated} · {Manifest.Devices.Count} device entries");
     }
 
-    /// <summary>Match a scanned device to the most specific definition available.</summary>
+    /// <summary>Match a scanned device to the most specific definition available. Precedence is fixed, not file
+    /// order: an exact device-ID entry beats a subsystem-ID entry, which beats a class-specific entry, which beats a
+    /// vendor-wide one (ties go to the earlier entry). A generic, widely shared chip ID never matches.</summary>
     public (Definition? def, VendorFallback? fallback) Match(ScannedDevice hw)
     {
-        Definition? venOnly = null;
+        if (IsGenericId(hw)) return (null, null);
 
+        Definition? best = null;
+        var bestScore = -1;
         foreach (var d in Manifest.Devices)
         {
-            if (!string.Equals(d.Bus, hw.Bus, StringComparison.OrdinalIgnoreCase)) continue;
-            if (!string.Equals(d.Ven, hw.Vendor, StringComparison.OrdinalIgnoreCase)) continue;
-            if (d.PnpClass is not null &&
-                !string.Equals(d.PnpClass, hw.PnpClass, StringComparison.OrdinalIgnoreCase)) continue;
+            if (!d.OnBus(hw.Bus)) continue;
+            if (!Same(d.Ven, hw.Vendor)) continue;
+            if (d.PnpClass is not null && !Same(d.PnpClass, hw.PnpClass)) continue;
+            var byDevice = d.Dev is { Count: > 0 };
+            if (byDevice && !d.Dev!.Any(x => Same(x, hw.Device))) continue;
+            var bySubsys = d.Subsys is { Count: > 0 };
+            if (bySubsys && !d.Subsys!.Any(x => Same(x, hw.SubsysVendor))) continue;
 
-            if (d.Dev is null || d.Dev.Count == 0)
-            {
-                venOnly ??= d;                        // vendor-wide entry; keep as fallback
-                continue;
-            }
-            if (d.Dev.Any(x => string.Equals(x, hw.Device, StringComparison.OrdinalIgnoreCase)))
-                return (d, null);                     // exact ven+dev match wins
+            var score = (byDevice ? 8 : 0) + (bySubsys ? 4 : 0) + (d.PnpClass is not null ? 2 : 0);
+            if (score > bestScore) { best = d; bestScore = score; }
         }
+        if (best is not null) return (best, null);
 
-        if (venOnly is not null) return (venOnly, null);
-
-        var fb = Manifest.VendorFallbacks.FirstOrDefault(
-            f => string.Equals(f.Ven, hw.Vendor, StringComparison.OrdinalIgnoreCase));
+        var fb = Manifest.VendorFallbacks.FirstOrDefault(f => Same(f.Ven, hw.Vendor));
         return (null, fb);
     }
+
+    /// <summary>True when the device's vendor ID is on the never-claim list (shared by countless brands).</summary>
+    public bool IsGenericId(ScannedDevice hw)
+        => Manifest.GenericIds.Any(g => Same(g.Bus, hw.Bus) && Same(g.Ven, hw.Vendor));
+
+    /// <summary>The chip/ODM maker entry for a part whose drivers come from the PC maker (a laptop's Chicony webcam,
+    /// a codec), or null. Callers only use it on a recognised OEM system, never on a DIY motherboard.</summary>
+    public OemPart? MatchOemPart(ScannedDevice hw)
+        => IsGenericId(hw) ? null : Manifest.OemParts.FirstOrDefault(o => Same(o.Bus, hw.Bus) && Same(o.Ven, hw.Vendor));
+
+    /// <summary>The board partner's own tools for a card (ASUS GPU Tweak on an ASUS-built GeForce...), found by its
+    /// SUBSYS vendor. They only add to the row's optional software; the driver still comes from <see cref="Match"/>.
+    /// Callers skip laptops, whose GPU carries the laptop maker's SUBSYS ID.</summary>
+    public IReadOnlyList<OptionalTool> PartnerToolsFor(ScannedDevice hw)
+    {
+        if (hw.SubsysVendor.Length == 0 || IsGenericId(hw)) return Array.Empty<OptionalTool>();
+        return Manifest.PartnerTools
+            .Where(p => Same(p.Bus, hw.Bus) && p.Vens.Any(v => Same(v, hw.Vendor))
+                && (p.PnpClass is null || Same(p.PnpClass, hw.PnpClass)) && p.Subsys.Any(s => Same(s, hw.SubsysVendor)))
+            .SelectMany(p => p.Tools)
+            .ToList();
+    }
+
+    private static bool Same(string? a, string? b) => string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Match a Win32_ComputerSystem/Win32_BaseBoard manufacturer string
     /// (e.g. "ASUSTeK COMPUTER INC.") against the curated system-vendor aliases.</summary>

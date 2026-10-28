@@ -1,13 +1,9 @@
 {
-  "schemaVersion": 1,
-  "updated": "2026-07-23",
+  "schemaVersion": 2,
+  "updated": "2026-10-28",
   "manifestUrl": null,
-
   "_comment": "CURATED DATABASE — every entry was checked against the manufacturer's own current support/download page (or, for GPUs, TechPowerUp, a stable and widely trusted driver mirror). A device is listed ONLY when a real, verifiable, official driver or control-software page exists for it; generic USB hubs, host/root controllers, and Windows in-box devices are deliberately left out. DIRECT DOWNLOADS that never go stale come from two fields: 'resolver' names a live lookup run every scan (e.g. 'nvidia-geforce' queries NVIDIA for the current Game Ready driver), and 'directDownload' is a vendor-maintained 'always latest' installer URL the vendor keeps pointed at the newest build (Intel DSA, SteelSeries GG, Razer Synapse). Per-version file URLs are otherwise NOT hardcoded (they rot within weeks) — those entries point at the vendor's stable support/drivers page. 'manifestUrl' can host an updated copy of this whole file for automatic refresh. Ordering matters: for a vendor with both a class-specific (pnpClass) entry and a general one, the class-specific entry must come FIRST so it wins for that class.",
-
   "devices": [
-
-
     {
       "label": "NVIDIA GeForce GPUs",
       "bus": "PCI",
@@ -29,9 +25,10 @@
           "note": "Trusted mirror archive of every NVIDIA GeForce driver",
           "url": "https://www.techpowerup.com/download/nvidia-geforce-graphics-drivers/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "AMD Radeon GPUs",
       "bus": "PCI",
@@ -53,9 +50,10 @@
           "note": "Trusted mirror archive of every AMD Radeon driver",
           "url": "https://www.techpowerup.com/download/amd-radeon-graphics-drivers/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Intel Arc / integrated graphics",
       "bus": "PCI",
@@ -63,11 +61,11 @@
       "dev": null,
       "pnpClass": "Display",
       "domain": "intel.com",
-      "supportPage": "https://www.intel.com/content/www/us/en/products/details/discrete-gpus/arc/software.html",
+      "supportPage": "https://www.intel.com/content/www/us/en/support/products/80939/graphics.html",
       "directDownload": {
         "label": "Intel Driver & Support Assistant",
         "url": "https://dsadata.intel.com/installer",
-        "note": "Official Intel installer — always latest; detects and updates Intel graphics"
+        "note": "Official Intel installer, always latest; detects and updates Intel graphics"
       },
       "versions": [],
       "optional": [
@@ -81,21 +79,62 @@
           "note": "Trusted mirror archive of every Intel graphics driver",
           "url": "https://www.techpowerup.com/download/intel-graphics-drivers/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked in a browser, the site blocks scripts)"
     },
-
+    {
+      "label": "NVIDIA HDMI / DisplayPort audio (installed with the GeForce driver)",
+      "bus": "HDAUDIO",
+      "ven": "10DE",
+      "dev": null,
+      "pnpClass": null,
+      "domain": "nvidia.com",
+      "supportPage": "https://www.nvidia.com/en-us/geforce/drivers/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "AMD HDMI / DisplayPort audio (installed with AMD Software)",
+      "bus": "HDAUDIO",
+      "ven": "1002",
+      "dev": null,
+      "pnpClass": null,
+      "domain": "amd.com",
+      "supportPage": "https://www.amd.com/en/support/download/drivers.html",
+      "referer": "https://www.amd.com/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Intel display audio (installed with the Intel graphics driver)",
+      "bus": "HDAUDIO",
+      "ven": "8086",
+      "dev": null,
+      "pnpClass": null,
+      "domain": "intel.com",
+      "supportPage": "https://www.intel.com/content/www/us/en/support/products/80939/graphics.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked in a browser, the site blocks scripts)"
+    },
     {
       "label": "Intel Wireless Bluetooth",
-      "bus": "PCI",
-      "ven": "8086",
+      "bus": "USB",
+      "ven": "8087",
       "dev": null,
       "pnpClass": "Bluetooth",
       "domain": "intel.com",
-      "supportPage": "https://www.intel.com/content/www/us/en/download-center/home.html",
+      "supportPage": "https://www.intel.com/content/www/us/en/download/18649/intel-wireless-bluetooth-drivers-for-windows-10-and-windows-11.html",
       "directDownload": {
         "label": "Intel Driver & Support Assistant",
         "url": "https://dsadata.intel.com/installer",
-        "note": "Official Intel installer — always latest; detects and updates Intel Bluetooth"
+        "note": "Official Intel installer, always latest; detects and updates Intel Bluetooth"
       },
       "versions": [],
       "optional": [
@@ -104,9 +143,32 @@
           "note": "Trusted mirror archive of every Intel Bluetooth driver",
           "url": "https://www.techpowerup.com/download/intel-wireless-bluetooth-drivers/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked in a browser, the site blocks scripts)"
     },
-
+    {
+      "label": "Intel Killer Wi-Fi",
+      "bus": "PCI",
+      "ven": "8086",
+      "dev": null,
+      "pnpClass": "Net",
+      "subsys": [
+        "1A56"
+      ],
+      "domain": "intel.com",
+      "supportPage": "https://www.intel.com/content/www/us/en/download/19779/intel-killer-performance-suite.html",
+      "versions": [],
+      "optional": [
+        {
+          "name": "Intel Killer Performance Suite",
+          "note": "Killer Wi-Fi + Ethernet drivers with the Killer control software",
+          "url": "https://www.intel.com/content/www/us/en/download/19779/intel-killer-performance-suite.html"
+        }
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Intel PCI 8086 with Killer (Bigfoot Networks) subsystem 1A56 per pci.ids; Intel download 19779 live 2026-10-28 (browser, the site blocks scripts)"
+    },
     {
       "label": "Intel Wi-Fi / Ethernet networking",
       "bus": "PCI",
@@ -118,7 +180,7 @@
       "directDownload": {
         "label": "Intel Driver & Support Assistant",
         "url": "https://dsadata.intel.com/installer",
-        "note": "Official Intel installer — always latest; detects and updates Intel network adapters"
+        "note": "Official Intel installer, always latest; detects and updates Intel network adapters"
       },
       "versions": [],
       "optional": [
@@ -132,10 +194,10 @@
           "note": "All Intel wired-LAN driver versions",
           "url": "https://www.techpowerup.com/download/intel-ethernet-networking-drivers/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked in a browser, the site blocks scripts)"
     },
-
-
     {
       "label": "AMD chipset (AM4 / AM5 platform)",
       "bus": "PCI",
@@ -156,9 +218,10 @@
           "note": "Trusted mirror archive of every AMD Ryzen chipset driver",
           "url": "https://www.techpowerup.com/download/amd-ryzen-chipset-drivers/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Intel devices (chipset / NPU / other)",
       "bus": "PCI",
@@ -169,13 +232,13 @@
       "directDownload": {
         "label": "Intel Driver & Support Assistant",
         "url": "https://dsadata.intel.com/installer",
-        "note": "Official Intel installer — always latest; detects and updates Intel chipset/NPU drivers"
+        "note": "Official Intel installer, always latest; detects and updates Intel chipset/NPU drivers"
       },
       "versions": [],
       "optional": [
         {
           "name": "Intel Driver & Support Assistant",
-          "note": "Intel's own official scanner — identifies and updates Intel components",
+          "note": "Intel's own official scanner, identifies and updates Intel components",
           "url": "https://www.intel.com/content/www/us/en/support/detect.html"
         },
         {
@@ -183,10 +246,27 @@
           "note": "All Intel AI Boost / NPU driver versions (Core Ultra)",
           "url": "https://www.techpowerup.com/download/intel-npu-drivers/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked in a browser, the site blocks scripts)"
     },
-
-
+    {
+      "label": "Killer Ethernet (Realtek-based E2500B / E2600 / E3000 / E5000)",
+      "bus": "PCI",
+      "ven": "10EC",
+      "dev": [
+        "2502",
+        "2600",
+        "3000",
+        "5000"
+      ],
+      "domain": "intel.com",
+      "supportPage": "https://www.intel.com/content/www/us/en/download/19779/intel-killer-performance-suite.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "pci.ids lists 10EC:2502/2600/3000/5000 as Killer E2500B/E2600/E3000/E5000; Intel download 19779 live 2026-10-28 (browser)"
+    },
     {
       "label": "Realtek PCIe devices (audio / LAN)",
       "bus": "PCI",
@@ -195,9 +275,10 @@
       "domain": "realtek.com",
       "supportPage": "https://www.realtek.com/Download/List?cate_id=584",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Creative Sound Blaster",
       "bus": "PCI",
@@ -206,21 +287,10 @@
       "domain": "creative.com",
       "supportPage": "https://support.creative.com/Downloads/searchdownloads.aspx",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
-
-    {
-      "label": "MediaTek Wi-Fi / Bluetooth",
-      "bus": "PCI",
-      "ven": "14C3",
-      "dev": null,
-      "domain": "mediatek.com",
-      "supportPage": "https://www.mediatek.com/products/broadband-wifi",
-      "versions": [],
-      "optional": []
-    },
-
     {
       "label": "Qualcomm Atheros Wi-Fi / Bluetooth",
       "bus": "PCI",
@@ -229,9 +299,26 @@
       "domain": "qualcomm.com",
       "supportPage": "https://www.qualcomm.com/support",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
+    {
+      "label": "Killer Ethernet (Atheros-based E2200 / E2400 / E2500)",
+      "bus": "PCI",
+      "ven": "1969",
+      "dev": [
+        "E091",
+        "E0A1",
+        "E0B1"
+      ],
+      "domain": "intel.com",
+      "supportPage": "https://www.intel.com/content/www/us/en/download/19779/intel-killer-performance-suite.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "pci.ids lists 1969:E091/E0A1/E0B1 as Killer E220x/E2400/E2500; Intel download 19779 live 2026-10-28 (browser)"
+    },
     {
       "label": "Broadcom network devices",
       "bus": "PCI",
@@ -240,10 +327,10 @@
       "domain": "broadcom.com",
       "supportPage": "https://www.broadcom.com/support/download-search",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
-
     {
       "label": "Samsung NVMe SSDs",
       "bus": "PCI",
@@ -258,9 +345,10 @@
           "note": "Official SSD health, firmware updates, performance tuning",
           "url": "https://semiconductor.samsung.com/consumer-storage/magician/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Western Digital / SanDisk NVMe SSDs",
       "bus": "PCI",
@@ -275,9 +363,10 @@
           "note": "Official SSD health, firmware updates",
           "url": "https://support-en.sandisk.com/app/answers/detailweb/a_id/31759"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked in a browser, the site blocks scripts)"
     },
-
     {
       "label": "Crucial / Micron NVMe SSDs",
       "bus": "PCI",
@@ -292,9 +381,196 @@
           "note": "Official SSD firmware updates, health monitoring",
           "url": "https://www.crucial.com/support/storage-executive"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
+    {
+      "label": "Crucial NVMe SSDs (P / T series)",
+      "bus": "PCI",
+      "ven": "C0A9",
+      "dev": null,
+      "domain": "crucial.com",
+      "supportPage": "https://www.crucial.com/support/storage-executive",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI C0A9 = Micron/Crucial in pci.ids (P1/P2/P3/P5/P310/T500/T700/T705/T710); Storage Executive page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Solidigm SSDs",
+      "bus": "PCI",
+      "ven": "025E",
+      "dev": null,
+      "domain": "solidigm.com",
+      "supportPage": "https://www.solidigm.com/support-page/drivers-downloads/ka-00085.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 025E = Solidigm in pci.ids (P41 Plus, P44 Pro, DC SSDs); Solidigm Storage Tool page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Intel SSDs (now supported by Solidigm)",
+      "bus": "PCI",
+      "ven": "8086",
+      "dev": [
+        "F1A5",
+        "F1A6",
+        "F1A7",
+        "F1A8",
+        "F1AA",
+        "FAF0",
+        "0953",
+        "0A53",
+        "0A54",
+        "0A55",
+        "0B60"
+      ],
+      "domain": "solidigm.com",
+      "supportPage": "https://www.solidigm.com/support-page/drivers-downloads/ka-00085.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "pci.ids names 8086:F1A5/F1A6/F1A7/F1A8/F1AA/FAF0 (600p/760p/700p/660p/670p/665p) and 0953/0A53/0A54/0A55/0B60 (DC SSDs); Intel's NAND SSD business moved to Solidigm, whose Storage Tool supports legacy Intel SSDs (page live 2026-10-28). Optane stays with Intel and is not listed"
+    },
+    {
+      "label": "KIOXIA SSDs",
+      "bus": "PCI",
+      "ven": "1E0F",
+      "dev": null,
+      "domain": "kioxia.com",
+      "supportPage": "https://apac.kioxia.com/en-apac/personal/software/ssd-utility.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 1E0F = KIOXIA in pci.ids; SSD Utility page live 2026-10-28 (checked by script; the en-us copy does not exist)"
+    },
+    {
+      "label": "Toshiba NVMe SSDs (now KIOXIA)",
+      "bus": "PCI",
+      "ven": "1179",
+      "dev": [
+        "010E",
+        "010F",
+        "0110",
+        "0113",
+        "0115",
+        "0116",
+        "0119",
+        "011A"
+      ],
+      "domain": "kioxia.com",
+      "supportPage": "https://apac.kioxia.com/en-apac/personal/software/ssd-utility.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "pci.ids names 1179:010E-011A as Toshiba XG3-XG6/BG3/PXP04/Cx5/XD5 NVMe SSDs; Toshiba Memory became KIOXIA, whose SSD Utility page links the Toshiba-branded build (live 2026-10-28). Exact devices only: 1179 also covers Toshiba laptop chips"
+    },
+    {
+      "label": "Seagate NVMe SSDs (FireCuda / BarraCuda / IronWolf)",
+      "bus": "PCI",
+      "ven": "1BB1",
+      "dev": null,
+      "domain": "seagate.com",
+      "supportPage": "https://www.seagate.com/support/downloads/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 1BB1 = Seagate Technology in pci.ids; downloads page live 2026-10-28 (browser, the site rate-limits scripts)"
+    },
+    {
+      "label": "ADATA / XPG NVMe SSDs",
+      "bus": "PCI",
+      "ven": "1CC1",
+      "dev": null,
+      "domain": "adata.com",
+      "supportPage": "https://www.adata.com/en/support/downloads/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 1CC1 = ADATA Technology in pci.ids (LEGEND / GAMMIX / SPECTRIX); downloads page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Lexar NVMe SSDs",
+      "bus": "PCI",
+      "ven": "1D97",
+      "dev": [
+        "1062",
+        "1202",
+        "1806",
+        "1D97",
+        "2508",
+        "2708",
+        "5236",
+        "5772"
+      ],
+      "domain": "lexar.com",
+      "supportPage": "https://americas.lexar.com/support/download/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "pci.ids names these 1D97 (Longsys) devices as Lexar-only models (NM710/NM610 PRO/NM990/NM620/NM1090 PRO/microSD Express/NM800 PRO/NQ700). Exact devices only: 1D97 is shared with FORESEE, HIKSEMI and Patriot. Downloads page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Transcend NVMe SSDs",
+      "bus": "PCI",
+      "ven": "1D79",
+      "dev": null,
+      "domain": "transcend-info.com",
+      "supportPage": "https://www.transcend-info.com/support/software",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 1D79 = Transcend Information in pci.ids; software download page live 2026-10-28 (checked by script; it redirects to the visitor's region)"
+    },
+    {
+      "label": "HighPoint RAID / NVMe controllers",
+      "bus": "PCI",
+      "ven": "1103",
+      "dev": null,
+      "domain": "highpoint-tech.com",
+      "supportPage": "https://www.highpoint-tech.com/windows-community",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 1103 = HighPoint Technologies in pci.ids; HighPoint has no single driver hub, its Windows page links each product line's driver downloads (live 2026-10-28, browser)"
+    },
+    {
+      "label": "Broadcom / LSI RAID and HBA controllers",
+      "bus": "PCI",
+      "ven": "1000",
+      "dev": null,
+      "domain": "broadcom.com",
+      "supportPage": "https://www.broadcom.com/support/download-search",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 1000 = Broadcom / LSI in pci.ids (MegaRAID / SAS HBAs); download search live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Adaptec RAID / HBA controllers (Microchip)",
+      "bus": "PCI",
+      "ven": "9005",
+      "dev": null,
+      "domain": "microchip.com",
+      "supportPage": "https://www.microchip.com/en-us/adaptec",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 9005 = Adaptec in pci.ids; Adaptec is now Microchip, whose Adaptec downloads page (drivers/firmware/software) was live 2026-10-28 (browser, the site blocks scripts)"
+    },
+    {
+      "label": "Areca RAID controllers",
+      "bus": "PCI",
+      "ven": "17D3",
+      "dev": null,
+      "domain": "areca.com.tw",
+      "supportPage": "https://www.areca.com.tw/support/downloads.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 17D3 = Areca Technology in pci.ids; downloads centre live 2026-10-28 (browser, the script request timed out)"
+    },
     {
       "label": "SK hynix NVMe SSDs",
       "bus": "PCI",
@@ -303,9 +579,10 @@
       "domain": "skhynix.com",
       "supportPage": "https://ssd.skhynix.com/download/",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Kingston / FURY NVMe SSDs",
       "bus": "PCI",
@@ -320,10 +597,10 @@
           "note": "Official SSD health monitoring and firmware updates",
           "url": "https://www.kingston.com/en/support/technical/ssdmanager"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
-
     {
       "label": "Realtek USB audio / network",
       "bus": "USB",
@@ -338,9 +615,10 @@
           "note": "Speaker/mic configuration and effects (Microsoft Store)",
           "url": "https://apps.microsoft.com/detail/9p2b8mcsvpln"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Focusrite / Novation audio interfaces",
       "bus": "USB",
@@ -349,10 +627,316 @@
       "domain": "focusrite.com",
       "supportPage": "https://downloads.focusrite.com/focusrite",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
-
+    {
+      "label": "PreSonus audio interfaces",
+      "bus": "USB",
+      "ven": "194F",
+      "dev": null,
+      "domain": "presonus.com",
+      "supportPage": "https://www.presonus.com/pages/universal-control",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 194F = PreSonus Audio Electronics in usb.ids; Universal Control (driver + control app) page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Yamaha / Steinberg audio and MIDI devices",
+      "bus": "USB",
+      "ven": "0499",
+      "dev": null,
+      "domain": "yamaha.com",
+      "supportPage": "https://usa.yamaha.com/support/updates/index.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0499 = Yamaha Corp. in usb.ids (Steinberg interfaces use it too; Steinberg is a Yamaha company); firmware/software updates page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Behringer audio interfaces / mixers",
+      "bus": "USB",
+      "ven": "1397",
+      "dev": null,
+      "domain": "behringer.com",
+      "supportPage": "https://www.behringer.com/en/support",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 1397 = BEHRINGER International in usb.ids; support page (Manuals and downloads by product) live 2026-10-28 (browser; the old /downloads.html is gone)"
+    },
+    {
+      "label": "M-Audio audio / MIDI interfaces",
+      "bus": "USB",
+      "ven": "0763",
+      "dev": null,
+      "domain": "m-audio.com",
+      "supportPage": "https://www.m-audio.com/support/downloads",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0763 = M-Audio in usb.ids; driver and software downloads page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "RME audio interfaces",
+      "bus": "USB",
+      "ven": "2A39",
+      "dev": null,
+      "domain": "rme-audio.de",
+      "supportPage": "https://rme-audio.de/downloads.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 2A39 = RME in usb.ids; downloads page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "MOTU audio interfaces",
+      "bus": "USB",
+      "ven": "07FD",
+      "dev": null,
+      "domain": "motu.com",
+      "supportPage": "https://motu.com/en-us/download/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 07FD = Mark of the Unicorn in usb.ids; download page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Native Instruments audio / controllers",
+      "bus": "USB",
+      "ven": "17CC",
+      "dev": null,
+      "domain": "native-instruments.com",
+      "supportPage": "https://www.native-instruments.com/pages/native-access",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 17CC = Native Instruments in usb.ids; Native Access (drivers + software) page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Roland / BOSS audio and MIDI devices",
+      "bus": "USB",
+      "ven": "0582",
+      "dev": null,
+      "domain": "roland.com",
+      "supportPage": "https://www.roland.com/global/support/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0582 = Roland Corp. in usb.ids (BOSS is a Roland brand); support page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "ZOOM recorders / interfaces",
+      "bus": "USB",
+      "ven": "1686",
+      "dev": null,
+      "domain": "zoomcorp.com",
+      "supportPage": "https://zoomcorp.com/en/us/support/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 1686 = ZOOM Corporation in usb.ids (0803 is the unrelated Zoom Telephonics); support page with drivers/firmware live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Arturia controllers / interfaces",
+      "bus": "USB",
+      "ven": "1C75",
+      "dev": null,
+      "domain": "arturia.com",
+      "supportPage": "https://www.arturia.com/support/downloads-manuals",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 1C75 = Arturia in usb.ids; downloads and manuals page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "RØDE microphones / interfaces",
+      "bus": "USB",
+      "ven": "19F7",
+      "dev": null,
+      "domain": "rode.com",
+      "supportPage": "https://rode.com/en/apps",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 19F7 = RODE Microphones in usb.ids; apps and software page live 2026-10-28 (checked by script; redirects to the visitor's region)"
+    },
+    {
+      "label": "Shure USB microphones / interfaces",
+      "bus": "USB",
+      "ven": "14ED",
+      "dev": null,
+      "domain": "shure.com",
+      "supportPage": "https://www.shure.com/en-US/products/software",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 14ED = Shure Inc. in usb.ids; software page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Creative USB audio (Sound Blaster X / G series)",
+      "bus": "USB",
+      "ven": "041E",
+      "dev": null,
+      "domain": "creative.com",
+      "supportPage": "https://support.creative.com/Downloads/searchdownloads.aspx",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 041E = Creative Technology in usb.ids; same downloads search as the PCI Sound Blaster entry, live 2026-10-28"
+    },
+    {
+      "label": "TASCAM audio interfaces / recorders",
+      "bus": "USB",
+      "ven": "1604",
+      "dev": null,
+      "domain": "tascam.com",
+      "supportPage": "https://tascam.com/us/support/download",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 1604 = Tascam in usb.ids; download page live 2026-10-28 (browser; the old /us/downloads/ path is a 404)"
+    },
+    {
+      "label": "TASCAM interfaces (older TEAC IDs)",
+      "bus": "USB",
+      "ven": "0644",
+      "dev": [
+        "800D",
+        "800E",
+        "801D",
+        "8021",
+        "8047"
+      ],
+      "domain": "tascam.com",
+      "supportPage": "https://tascam.com/us/support/download",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "usb.ids names 0644:800D/800E/801D/8021/8047 as TASCAM DP-01FX/US-122L/DR-100/US-122mkII/US-16x08. Exact devices only: 0644 also covers TEAC drives and card readers"
+    },
+    {
+      "label": "Apogee audio interfaces",
+      "bus": "USB",
+      "ven": "0C60",
+      "dev": null,
+      "domain": "apogeedigital.com",
+      "supportPage": "https://apogeedigital.com/download-files/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0C60 = Apogee Electronics in usb.ids; downloads page live 2026-10-28 (browser; /support/ is a 404)"
+    },
+    {
+      "label": "Akai Professional controllers",
+      "bus": "USB",
+      "ven": "09E8",
+      "dev": null,
+      "domain": "akaipro.com",
+      "supportPage": "https://www.akaipro.com/downloads-and-support/downloads/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 09E8 = AKAI Professional M.I. in usb.ids; downloads page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "KORG keyboards / controllers",
+      "bus": "USB",
+      "ven": "0944",
+      "dev": null,
+      "domain": "korg.com",
+      "supportPage": "https://www.korg.com/us/support/download/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0944 = KORG in usb.ids; downloads page (USB-MIDI driver, updaters) live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Elektron instruments (Overbridge)",
+      "bus": "USB",
+      "ven": "1935",
+      "dev": null,
+      "domain": "elektron.se",
+      "supportPage": "https://www.elektron.se/overbridge",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 1935 = Elektron Music Machines in usb.ids; Overbridge download page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "IK Multimedia interfaces / controllers",
+      "bus": "USB",
+      "ven": "1963",
+      "dev": null,
+      "domain": "ikmultimedia.com",
+      "supportPage": "https://ikmultimedia.com/en-us/pages/ik-product-manager",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 1963 = IK Multimedia in usb.ids; IK Product Manager page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Blue microphones (now Logitech G)",
+      "bus": "USB",
+      "ven": "B58E",
+      "dev": null,
+      "domain": "logitechg.com",
+      "supportPage": "https://www.logitechg.com/en-us/software/ghub",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB B58E = Blue Microphones in usb.ids; Blue is a Logitech brand and Blue VO!CE lives in G HUB (page live 2026-10-28, checked by script)"
+    },
+    {
+      "label": "EPOS / Sennheiser headsets (DSEA)",
+      "bus": "USB",
+      "ven": "1395",
+      "dev": null,
+      "domain": "eposaudio.com",
+      "supportPage": "https://www.eposaudio.com/en-us/software/epos-connect/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 1395 = DSEA A/S (the Demant / Sennheiser joint venture now trading as EPOS) in usb.ids; EPOS Connect page live 2026-10-28 (browser; older knowledge-base links are gone)"
+    },
+    {
+      "label": "Jabra headsets / speakerphones",
+      "bus": "USB",
+      "ven": "0B0E",
+      "dev": null,
+      "domain": "jabra.com",
+      "supportPage": "https://www.jabra.com/software-and-services/jabra-direct",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0B0E = GN Netcom (Jabra's maker) in usb.ids; Jabra Direct page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Poly / Plantronics headsets (HP)",
+      "bus": "USB",
+      "ven": "047F",
+      "dev": null,
+      "domain": "hp.com",
+      "supportPage": "https://www.hp.com/us-en/poly/software-and-services/software/poly-lens.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 047F = Plantronics in usb.ids; Plantronics + Polycom became Poly, now part of HP; Poly Lens page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Poly / Polycom conferencing devices (HP)",
+      "bus": "USB",
+      "ven": "095D",
+      "dev": null,
+      "domain": "hp.com",
+      "supportPage": "https://www.hp.com/us-en/poly/software-and-services/software/poly-lens.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 095D = Polycom in usb.ids; now Poly (HP); Poly Lens page live 2026-10-28 (checked by script)"
+    },
     {
       "label": "Logitech devices",
       "bus": "USB",
@@ -364,17 +948,146 @@
       "optional": [
         {
           "name": "Logitech G HUB",
-          "note": "For Logitech G gaming mice/keyboards/headsets — lighting, DPI, macros",
+          "note": "For Logitech G gaming mice/keyboards/headsets, lighting, DPI, macros",
           "url": "https://www.logitechg.com/en-us/software/ghub"
         },
         {
           "name": "Logi Options+",
-          "note": "For non-gaming Logitech mice/keyboards/webcams — button and gesture customization",
+          "note": "For non-gaming Logitech mice/keyboards/webcams, button and gesture customization",
           "url": "https://www.logitech.com/en-us/software/logi-options-plus.html"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
+    {
+      "label": "Wacom pen tablets / displays",
+      "bus": "USB",
+      "ven": "056A",
+      "dev": null,
+      "domain": "wacom.com",
+      "supportPage": "https://www.wacom.com/en-us/support/product-support/drivers",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 056A = Wacom Co. in usb.ids; drivers page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Huion pen tablets / displays",
+      "bus": "USB",
+      "ven": "256C",
+      "dev": null,
+      "domain": "huion.com",
+      "supportPage": "https://www.huion.com/download",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 256C is not in usb.ids; the Linux kernel's drivers/hid/hid-ids.h defines USB_VENDOR_ID_HUION 0x256c. Driver download centre live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "XPPen / UGEE pen tablets",
+      "bus": "USB",
+      "ven": "28BD",
+      "dev": null,
+      "domain": "xp-pen.com",
+      "supportPage": "https://www.xp-pen.com/download",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 28BD = XP-Pen in usb.ids (the kernel's hid-ids.h calls it UGEE, XPPen's parent brand); driver download page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "3Dconnexion SpaceMouse",
+      "bus": "USB",
+      "ven": "256F",
+      "dev": null,
+      "domain": "3dconnexion.com",
+      "supportPage": "https://3dconnexion.com/us/drivers/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 256F = 3Dconnexion in usb.ids; drivers page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Tobii eye trackers",
+      "bus": "USB",
+      "ven": "2104",
+      "dev": null,
+      "domain": "tobii.com",
+      "supportPage": "https://gaming.tobii.com/getstarted/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 2104 = Tobii Technology in usb.ids; software/driver setup page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Kensington mice / trackballs",
+      "bus": "USB",
+      "ven": "047D",
+      "dev": null,
+      "domain": "kensington.com",
+      "supportPage": "https://www.kensington.com/software/kensingtonworks/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 047D = Kensington in usb.ids; KensingtonWorks page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Genius peripherals (KYE)",
+      "bus": "USB",
+      "ven": "0458",
+      "dev": null,
+      "domain": "geniusnet.com",
+      "supportPage": "https://www.geniusnet.com/en/support",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0458 = KYE Systems (the Genius brand) in usb.ids; Download & FAQ page live 2026-10-28 (browser; the old /download/ link redirects to the home page)"
+    },
+    {
+      "label": "Trust peripherals",
+      "bus": "USB",
+      "ven": "145F",
+      "dev": null,
+      "domain": "trust.com",
+      "supportPage": "https://www.trust.com/en/support",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 145F = Trust in usb.ids; support site (downloads per product) live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "HyperX headsets / keyboards / mice (now HP)",
+      "bus": "USB",
+      "ven": "0951",
+      "dev": [
+        "16A4",
+        "16B3",
+        "16C4",
+        "16D2",
+        "16D4",
+        "16DF",
+        "16E4"
+      ],
+      "domain": "hyperx.com",
+      "supportPage": "https://hyperx.com/pages/ngenuity",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "usb.ids names 0951:16A4/16B3/16C4/16D2/16D4/16DF/16E4 as HyperX 7.1 Audio/Savage/Cloud Flight/Alloy FPS Pro/SavageEXO/QuadCast/Pulsefire Raid (made under Kingston's ID before HP bought HyperX); NGENUITY page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Kingston USB drives",
+      "bus": "USB",
+      "ven": "0951",
+      "dev": null,
+      "domain": "kingston.com",
+      "supportPage": "https://www.kingston.com/en/support",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0951 = Kingston Technology in usb.ids (DataTraveler / IronKey); the HyperX models above match first. Support page live 2026-10-28 (same page as the Kingston NVMe entry)"
+    },
     {
       "label": "Razer devices",
       "bus": "USB",
@@ -385,12 +1098,17 @@
       "directDownload": {
         "label": "Razer Synapse 4",
         "url": "https://rzr.to/synapse-4-pc-download",
-        "note": "Official Razer Synapse installer — always latest; drivers, lighting, and macros"
+        "note": "Official Razer Synapse installer, always latest; drivers, lighting, and macros"
       },
       "versions": [],
-      "optional": []
+      "optional": [],
+      "cdnHosts": [
+        "razerzone.com",
+        "rzr.to"
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Corsair devices",
       "bus": "USB",
@@ -405,9 +1123,10 @@
           "note": "Lighting, fan/pump curves, and macros for Corsair peripherals and coolers",
           "url": "https://www.corsair.com/us/en/explorer/icue/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "SteelSeries devices",
       "bus": "USB",
@@ -418,12 +1137,16 @@
       "directDownload": {
         "label": "SteelSeries GG",
         "url": "https://steelseries.com/gg/downloads/gg/latest/windows",
-        "note": "Official SteelSeries GG suite — always latest; drivers, lighting, and audio"
+        "note": "Official SteelSeries GG suite, always latest; drivers, lighting, and audio"
       },
       "versions": [],
-      "optional": []
+      "optional": [],
+      "cdnHosts": [
+        "steelseriescdn.com"
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Elgato devices",
       "bus": "USB",
@@ -432,9 +1155,10 @@
       "domain": "elgato.com",
       "supportPage": "https://www.elgato.com/ww/en/s/downloads",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Gigabyte / AORUS peripherals",
       "bus": "USB",
@@ -449,9 +1173,10 @@
           "note": "Lighting, macros, and tuning for GIGABYTE/AORUS peripherals",
           "url": "https://www.gigabyte.com/Consumer/Software/GIGABYTE-Control-Center/global/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked in a browser, the site blocks scripts)"
     },
-
     {
       "label": "ASUS devices (peripherals / Wi-Fi / docks)",
       "bus": "USB",
@@ -463,12 +1188,13 @@
       "optional": [
         {
           "name": "Armoury Crate",
-          "note": "For ROG/TUF peripherals — lighting, macros, device settings",
+          "note": "For ROG/TUF peripherals, lighting, macros, device settings",
           "url": "https://www.asus.com/support/download-center/armoury-crate/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "MSI devices (peripherals / docks)",
       "bus": "USB",
@@ -480,12 +1206,13 @@
       "optional": [
         {
           "name": "MSI Center",
-          "note": "For MSI peripherals and systems — lighting, macros, tuning",
-          "url": "https://www.msi.com/support/download/MSI-Center"
+          "note": "For MSI peripherals and systems, lighting, macros, tuning",
+          "url": "https://www.msi.com/Landing/MSI-Center"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked in a browser, the site blocks scripts)"
     },
-
     {
       "label": "Cherry keyboards / mice",
       "bus": "USB",
@@ -494,20 +1221,22 @@
       "domain": "cherry.de",
       "supportPage": "https://www.cherry.de/en-us/downloads",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked in a browser, the site blocks scripts)"
     },
-
     {
       "label": "Cooler Master peripherals",
       "bus": "USB",
       "ven": "2516",
       "dev": null,
       "domain": "coolermaster.com",
-      "supportPage": "https://www.coolermaster.com/downloads/",
+      "supportPage": "https://www.coolermaster.com/en-global/masterplus.html",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Turtle Beach headsets",
       "bus": "USB",
@@ -516,20 +1245,22 @@
       "domain": "turtlebeach.com",
       "supportPage": "https://support.turtlebeach.com/s/downloads",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
-      "label": "ROCCAT peripherals",
+      "label": "ROCCAT peripherals (now Turtle Beach, Swarm II)",
       "bus": "USB",
       "ven": "1E7D",
       "dev": null,
-      "domain": "roccat.com",
-      "supportPage": "https://support.roccat.com/s/software-downloads",
+      "domain": "turtlebeach.com",
+      "supportPage": "https://support.turtlebeach.com/s/downloads",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "A4Tech peripherals",
       "bus": "USB",
@@ -538,9 +1269,10 @@
       "domain": "a4tech.com",
       "supportPage": "https://www.a4tech.com/download.aspx",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Mad Catz / Saitek controllers",
       "bus": "USB",
@@ -549,9 +1281,10 @@
       "domain": "madcatz.com",
       "supportPage": "https://www.madcatz.com/en/Support/Downloads",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Wooting keyboards",
       "bus": "USB",
@@ -560,9 +1293,10 @@
       "domain": "wooting.io",
       "supportPage": "https://wooting.io/wootility",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID from Wooting (newer than the public usb.ids list); links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Thrustmaster wheels / joysticks",
       "bus": "USB",
@@ -571,10 +1305,73 @@
       "domain": "thrustmaster.com",
       "supportPage": "https://support.thrustmaster.com/en/",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
-
+    {
+      "label": "8BitDo controllers",
+      "bus": "USB",
+      "ven": "2DC8",
+      "dev": null,
+      "domain": "8bitdo.com",
+      "supportPage": "https://support.8bitdo.com/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 2DC8 = 8BitDo in usb.ids and the kernel's hid-ids.h; support site (Ultimate Software + firmware) live 2026-10-28 (browser; the old /ultimate-software/ path is a 404)"
+    },
+    {
+      "label": "Fanatec wheels / pedals",
+      "bus": "USB",
+      "ven": "0EB7",
+      "dev": null,
+      "domain": "fanatec.com",
+      "supportPage": "https://fanatec.com/us/en/s/download-apps-driver",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0EB7 = Endor AG (the company behind Fanatec) in usb.ids; apps + driver download page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Fanatec devices (newer ID)",
+      "bus": "USB",
+      "ven": "3767",
+      "dev": null,
+      "domain": "fanatec.com",
+      "supportPage": "https://fanatec.com/us/en/s/download-apps-driver",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 3767 = Fanatec in usb.ids; same download page, live 2026-10-28"
+    },
+    {
+      "label": "MOZA Racing wheels / pedals",
+      "bus": "USB",
+      "ven": "346E",
+      "dev": null,
+      "domain": "mozaracing.com",
+      "supportPage": "https://mozaracing.com/pages/download-center",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 346E is not in usb.ids; the Linux kernel's drivers/hid/hid-ids.h defines USB_VENDOR_ID_MOZA 0x346e. Download Center (Pit House + drivers) live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Sony DualSense controllers",
+      "bus": "USB",
+      "ven": "054C",
+      "dev": [
+        "0CE6",
+        "0DF2"
+      ],
+      "domain": "playstation.net",
+      "supportPage": "https://controller.dl.playstation.net/controller/lang/en/fwupdater.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "usb.ids names 054C:0CE6/0DF2 as DualSense / DualSense Edge. Exact devices only: 054C covers every Sony USB product. Sony's PC firmware updater page live 2026-10-28 (checked by script)"
+    },
     {
       "label": "NZXT devices",
       "bus": "USB",
@@ -589,27 +1386,28 @@
           "note": "Monitoring, fan/pump control, and lighting for NZXT hardware",
           "url": "https://nzxt.com/en-US/software/cam"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Thermaltake devices",
       "bus": "USB",
       "ven": "264A",
       "dev": null,
       "domain": "thermaltake.com",
-      "supportPage": "https://www.thermaltake.com/downloads",
+      "supportPage": "https://thermaltake.com/pages/downloads",
       "versions": [],
       "optional": [
         {
           "name": "TT RGB Plus",
           "note": "Lighting and monitoring for Thermaltake RGB hardware",
-          "url": "https://www.thermaltake.com/downloads"
+          "url": "https://ttrgbplus.thermaltake.com/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
-
     {
       "label": "AVerMedia capture / tuner",
       "bus": "USB",
@@ -618,9 +1416,10 @@
       "domain": "avermedia.com",
       "supportPage": "https://www.avermedia.com/support/download",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Hauppauge TV tuners",
       "bus": "USB",
@@ -629,10 +1428,70 @@
       "domain": "hauppauge.com",
       "supportPage": "https://www.hauppauge.com/pages/support/support_usb.html",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
-
+    {
+      "label": "AVerMedia capture cards (PCIe)",
+      "bus": "PCI",
+      "ven": "1461",
+      "dev": null,
+      "domain": "avermedia.com",
+      "supportPage": "https://www.avermedia.com/support/download",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 1461 = AVerMedia Technologies in pci.ids; same download page as the USB AVerMedia entry, live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Blackmagic Design capture cards (DeckLink / Intensity)",
+      "bus": "PCI",
+      "ven": "BDBD",
+      "dev": null,
+      "domain": "blackmagicdesign.com",
+      "supportPage": "https://www.blackmagicdesign.com/support/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI BDBD = Blackmagic Design in pci.ids; support centre (Desktop Video drivers) live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Blackmagic Design USB devices (ATEM / UltraStudio)",
+      "bus": "USB",
+      "ven": "1EDB",
+      "dev": null,
+      "domain": "blackmagicdesign.com",
+      "supportPage": "https://www.blackmagicdesign.com/support/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 1EDB = Blackmagic design in usb.ids; support centre live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Magewell capture cards",
+      "bus": "PCI",
+      "ven": "1CD7",
+      "dev": null,
+      "domain": "magewell.com",
+      "supportPage": "https://www.magewell.com/downloads",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 1CD7 = Nanjing Magewell Electronics in pci.ids; download centre live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "AVer webcams / PTZ / document cameras",
+      "bus": "USB",
+      "ven": "2574",
+      "dev": null,
+      "domain": "aver.com",
+      "supportPage": "https://www.aver.com/download-center",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 2574 = AVer Information (separate from AVerMedia) in usb.ids; download centre live 2026-10-28 (checked by script)"
+    },
     {
       "label": "TP-Link Wi-Fi / Bluetooth adapters",
       "bus": "USB",
@@ -641,9 +1500,10 @@
       "domain": "tp-link.com",
       "supportPage": "https://www.tp-link.com/us/support/download/",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "D-Link adapters",
       "bus": "USB",
@@ -652,9 +1512,10 @@
       "domain": "dlink.com",
       "supportPage": "https://www.dlink.com/en/hq-download-center",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Netgear adapters",
       "bus": "USB",
@@ -663,10 +1524,170 @@
       "domain": "netgear.com",
       "supportPage": "https://www.netgear.com/support/download/",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
-
+    {
+      "label": "ASIX USB Ethernet adapters",
+      "bus": "USB",
+      "ven": "0B95",
+      "dev": null,
+      "domain": "asix.com.tw",
+      "supportPage": "https://www.asix.com.tw/en/product/USBEthernet",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0B95 = ASIX Electronics in usb.ids; product/driver page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Marvell AQtion (Aquantia) 5G / 10G Ethernet",
+      "bus": "PCI",
+      "ven": "1D6A",
+      "dev": null,
+      "domain": "marvell.com",
+      "supportPage": "https://www.marvell.com/support/ethernet-adapters-and-controllers.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 1D6A = Aquantia (Marvell since 2019) in pci.ids; AQtion support page live 2026-10-28 (browser, the site blocks scripts)"
+    },
+    {
+      "label": "NVIDIA ConnectX (Mellanox) network adapters",
+      "bus": "PCI",
+      "ven": "15B3",
+      "dev": null,
+      "domain": "nvidia.com",
+      "supportPage": "https://network.nvidia.com/products/adapter-software/ethernet/windows/winof-2/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "PCI 15B3 = Mellanox (NVIDIA since 2020) in pci.ids; WinOF-2 Windows driver page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Edimax Wi-Fi / Ethernet adapters",
+      "bus": "USB",
+      "ven": "7392",
+      "dev": null,
+      "domain": "edimax.com",
+      "supportPage": "https://www.edimax.com/download",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 7392 = Edimax Technology in usb.ids; download centre live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Linksys USB adapters",
+      "bus": "USB",
+      "ven": "13B1",
+      "dev": null,
+      "domain": "linksys.com",
+      "supportPage": "https://support.linksys.com/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 13B1 = Linksys in usb.ids; support site live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Belkin adapters / docks",
+      "bus": "USB",
+      "ven": "050D",
+      "dev": null,
+      "domain": "belkin.com",
+      "supportPage": "https://www.belkin.com/support-center/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 050D = Belkin Components in usb.ids; support centre live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "DisplayLink USB docks / adapters (Synaptics)",
+      "bus": "USB",
+      "ven": "17E9",
+      "dev": null,
+      "domain": "synaptics.com",
+      "supportPage": "https://www.synaptics.com/products/displaylink-graphics/downloads/windows",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 17E9 = DisplayLink in usb.ids; DisplayLink is now part of Synaptics, whose Windows driver page was live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Dell docks / keyboards / mice",
+      "bus": "USB",
+      "ven": "413C",
+      "dev": null,
+      "domain": "dell.com",
+      "supportPage": "https://www.dell.com/support/home/en-us?app=drivers",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 413C = Dell Computer Corp. in usb.ids; same Dell drivers page as the Dell system entry (live 2026-10-28)"
+    },
+    {
+      "label": "Lenovo docks / keyboards / mice",
+      "bus": "USB",
+      "ven": "17EF",
+      "dev": null,
+      "domain": "lenovo.com",
+      "supportPage": "https://pcsupport.lenovo.com/us/en",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 17EF = Lenovo in usb.ids; same Lenovo support page as the Lenovo system entry (live 2026-10-28)"
+    },
+    {
+      "label": "Silicon Labs CP210x USB-to-serial",
+      "bus": "USB",
+      "ven": "10C4",
+      "dev": [
+        "EA60",
+        "EA70",
+        "EA71"
+      ],
+      "domain": "silabs.com",
+      "supportPage": "https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "usb.ids names 10C4:EA60/EA70/EA71 as CP210x/CP2105/CP2108 UART bridges (the chip's default IDs; products that use 10C4 with their own product ID are left out). VCP driver page live 2026-10-28 (browser, the site blocks scripts)"
+    },
+    {
+      "label": "WCH CH340 / CH341 USB-to-serial",
+      "bus": "USB",
+      "ven": "1A86",
+      "dev": [
+        "5523",
+        "7522",
+        "7523",
+        "7584"
+      ],
+      "domain": "wch-ic.com",
+      "supportPage": "https://www.wch-ic.com/downloads/CH341SER_EXE.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "usb.ids names 1A86:5523/7522/7523/7584 as CH341 serial mode / CH340 / CH340S converters (other 1A86 modes need different WCH drivers and are left out); CH341SER driver page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "WCH CH38x PCIe serial / parallel cards",
+      "bus": "PCI",
+      "ven": "1C00",
+      "dev": [
+        "3050",
+        "3250",
+        "3252",
+        "3253",
+        "3470",
+        "3853"
+      ],
+      "domain": "wch-ic.com",
+      "supportPage": "https://www.wch-ic.com/downloads/CH38XDRV_ZIP.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "pci.ids names 1C00:3050/3250/3252/3253/3470/3853 as CH382 / CH384 PCIe port adapters; CH38XDRV driver page live 2026-10-28 (checked by script)"
+    },
     {
       "label": "Seagate external drives",
       "bus": "USB",
@@ -681,9 +1702,120 @@
           "note": "Backup, sync, and status/LED management for Seagate drives",
           "url": "https://www.seagate.com/support/software/toolkit/"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
+    {
+      "label": "LaCie external drives",
+      "bus": "USB",
+      "ven": "059F",
+      "dev": null,
+      "domain": "seagate.com",
+      "supportPage": "https://www.seagate.com/support/software/lacie-toolkit/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 059F = LaCie in usb.ids; LaCie is a Seagate brand and its Toolkit support lives on seagate.com (live 2026-10-28, browser)"
+    },
+    {
+      "label": "Western Digital external hard drives (My Passport / My Book / Elements)",
+      "bus": "USB",
+      "ven": "1058",
+      "dev": null,
+      "domain": "wd.com",
+      "supportPage": "https://support-en.wd.com/app/products/downloads/softwaredownloads",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 1058 = Western Digital in usb.ids; after the 2025 split WD keeps hard drives (flash went to SanDisk); WD software downloads live 2026-10-28 (browser; the old support.wdc.com link now shows 'no longer available')"
+    },
+    {
+      "label": "SanDisk USB drives / card readers",
+      "bus": "USB",
+      "ven": "0781",
+      "dev": null,
+      "domain": "sandisk.com",
+      "supportPage": "https://support-en.sandisk.com/app/products/downloads/softwaredownloads",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0781 = SanDisk in usb.ids; SanDisk software downloads live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Samsung Portable SSDs (T1 / T3 / T5 / T7)",
+      "bus": "USB",
+      "ven": "04E8",
+      "dev": [
+        "8002",
+        "8003",
+        "61F3",
+        "61F5",
+        "4001"
+      ],
+      "domain": "samsung.com",
+      "supportPage": "https://semiconductor.samsung.com/consumer-storage/support/tools/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "usb.ids names 04E8:8002/8003/61F3/61F5/4001 as Samsung Portable SSDs (T1/T3/T5/T7). Exact devices only: 04E8 also covers Samsung phones and other devices. Tools page (Portable SSD Software) live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Toshiba external hard drives (Canvio)",
+      "bus": "USB",
+      "ven": "0480",
+      "dev": [
+        "0100",
+        "0200",
+        "0212",
+        "0820",
+        "0821",
+        "0900",
+        "A006",
+        "A007",
+        "A009",
+        "A00D",
+        "A100",
+        "A102",
+        "A202",
+        "A208",
+        "B001",
+        "B207",
+        "D000",
+        "D010",
+        "D011"
+      ],
+      "domain": "toshiba-storage.com",
+      "supportPage": "https://www.toshiba-storage.com/support/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "usb.ids names these 0480 devices as Toshiba Canvio / Stor.E external disks (the InTouch modules are left out); Toshiba storage support page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Lexar USB drives / card readers",
+      "bus": "USB",
+      "ven": "05DC",
+      "dev": null,
+      "domain": "lexar.com",
+      "supportPage": "https://americas.lexar.com/support/download/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 05DC = Lexar Media in usb.ids; downloads page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Transcend USB drives / card readers",
+      "bus": "USB",
+      "ven": "8564",
+      "dev": null,
+      "domain": "transcend-info.com",
+      "supportPage": "https://www.transcend-info.com/support/software",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 8564 = Transcend Information in usb.ids (JetFlash / StoreJet / readers). 1307 is left out: it also appears in hama / Sakar readers. Software page live 2026-10-28 (browser)"
+    },
     {
       "label": "ADATA / XPG storage",
       "bus": "USB",
@@ -698,10 +1830,10 @@
           "note": "Health monitoring and firmware updates for ADATA/XPG SSDs",
           "url": "https://www.xpg.com/us/ssdtoolbox"
         }
-      ]
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
-
     {
       "label": "Valve Index / SteamVR",
       "bus": "USB",
@@ -710,9 +1842,10 @@
       "domain": "steampowered.com",
       "supportPage": "https://store.steampowered.com/app/250820/SteamVR/",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "HTC Vive",
       "bus": "USB",
@@ -721,9 +1854,10 @@
       "domain": "vive.com",
       "supportPage": "https://www.vive.com/us/setup/",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked by script)"
     },
-
     {
       "label": "Meta Quest (Rift / Link)",
       "bus": "USB",
@@ -732,49 +1866,980 @@
       "domain": "meta.com",
       "supportPage": "https://www.meta.com/quest/setup/",
       "versions": [],
-      "optional": []
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "Vendor ID in the public PCI/USB ID registries; links live on 2026-10-28 (checked in a browser, the site blocks scripts)"
+    },
+    {
+      "label": "HP printers / scanners / accessories",
+      "bus": "USB",
+      "ven": "03F0",
+      "dev": null,
+      "domain": "hp.com",
+      "supportPage": "https://support.hp.com/us-en/drivers",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 03F0 = HP, Inc in usb.ids (printers, scanners, docks, accessories); HP drivers page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Canon printers / scanners / cameras",
+      "bus": "USB",
+      "ven": "04A9",
+      "dev": null,
+      "domain": "canon.com",
+      "supportPage": "https://www.usa.canon.com/support",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 04A9 = Canon, Inc. in usb.ids; Canon support (drivers by product type) live 2026-10-28 (browser, the site blocks scripts)"
+    },
+    {
+      "label": "Canon imageFORMULA document scanners",
+      "bus": "USB",
+      "ven": "1083",
+      "dev": null,
+      "domain": "canon.com",
+      "supportPage": "https://www.usa.canon.com/support",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 1083 = Canon Electronics in usb.ids (DR-series imageFORMULA scanners); Canon support live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Epson printers / scanners",
+      "bus": "USB",
+      "ven": "04B8",
+      "dev": null,
+      "domain": "epson.com",
+      "supportPage": "https://epson.com/Support/sl/s",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 04B8 = Seiko Epson in usb.ids; Epson support live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Brother printers / scanners / label printers",
+      "bus": "USB",
+      "ven": "04F9",
+      "dev": null,
+      "domain": "brother.com",
+      "supportPage": "https://support.brother.com/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 04F9 = Brother Industries in usb.ids; support & downloads site live 2026-10-28 (browser; it opens the visitor's country)"
+    },
+    {
+      "label": "Lexmark printers",
+      "bus": "USB",
+      "ven": "043D",
+      "dev": null,
+      "domain": "lexmark.com",
+      "supportPage": "https://support.lexmark.com/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 043D = Lexmark International in usb.ids; support site live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Xerox printers / scanners",
+      "bus": "USB",
+      "ven": "0924",
+      "dev": null,
+      "domain": "xerox.com",
+      "supportPage": "https://www.support.xerox.com/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0924 = Xerox in usb.ids; Product Support and Drivers site live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Visioneer scanners",
+      "bus": "USB",
+      "ven": "04A7",
+      "dev": null,
+      "domain": "visioneer.com",
+      "supportPage": "https://www.visioneer.com/drivers-and-manuals/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 04A7 = Visioneer in usb.ids; drivers and manuals page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Avision scanners",
+      "bus": "USB",
+      "ven": "0638",
+      "dev": null,
+      "domain": "avision.com",
+      "supportPage": "https://www.avision.com/en/download/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0638 = Avision in usb.ids; download centre (Avision Update) live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Zebra label / receipt printers",
+      "bus": "USB",
+      "ven": "0A5F",
+      "dev": null,
+      "domain": "zebra.com",
+      "supportPage": "https://support.zebra.com/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0A5F = Zebra Technologies in usb.ids; support portal live 2026-10-28 (checked by script; the old support-downloads page redirects here)"
+    },
+    {
+      "label": "DYMO label printers",
+      "bus": "USB",
+      "ven": "0922",
+      "dev": null,
+      "domain": "dymo.com",
+      "supportPage": "https://www.dymo.com/support",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 0922 = Dymo-CoStar in usb.ids; support centre (Driver & Software Downloads) live 2026-10-28 (browser)"
+    },
+    {
+      "label": "OKI printers",
+      "bus": "USB",
+      "ven": "06BC",
+      "dev": null,
+      "domain": "oki.com",
+      "supportPage": "https://www.oki.com/eu/printing/support/drivers-and-utilities/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "USB 06BC = Oki Data in usb.ids; drivers & utilities page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Kyocera printers / MFPs",
+      "bus": "USB",
+      "ven": "0482",
+      "dev": [
+        "000E",
+        "000F",
+        "0015",
+        "0408",
+        "0640",
+        "069B",
+        "06B4"
+      ],
+      "domain": "kyoceradocumentsolutions.com",
+      "supportPage": "https://www.kyoceradocumentsolutions.com/support_product/index.html",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "usb.ids names 0482:000E/000F/0015/0408 as FS-series printers and 0640/069B/06B4 as ECOSYS MFPs. Exact devices only: 0482 also covers Kyocera cameras and phones. Download page live 2026-10-28 (checked by script)"
+    },
+    {
+      "label": "Ricoh printers / MFPs",
+      "bus": "USB",
+      "ven": "05CA",
+      "dev": [
+        "0403",
+        "0437",
+        "044E"
+      ],
+      "domain": "ricoh-usa.com",
+      "supportPage": "https://www.ricoh-usa.com/en/support-and-download",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "usb.ids names 05CA:0403/0437/044E as Ricoh Printing Support / Aficio SP 3510SF / SP C250SF. Exact devices only: 05CA also covers Ricoh cameras and the R5U870 webcam chip inside other brands' laptops. Support and downloads page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Ricoh (PFU / Fujitsu) fi-series scanners",
+      "bus": "USB",
+      "ven": "04C5",
+      "dev": [
+        "1029",
+        "1033",
+        "1041",
+        "1042",
+        "1096",
+        "1097",
+        "10AE",
+        "10AF",
+        "10C7",
+        "10E0",
+        "10E1",
+        "10E7",
+        "114F",
+        "1150",
+        "11F3",
+        "132E",
+        "15FF"
+      ],
+      "domain": "ricoh.com",
+      "supportPage": "https://www.pfu.ricoh.com/global/scanners/fisp/dl/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "usb.ids names these 04C5 devices as fi-series scanners (PFU, formerly Fujitsu, now a Ricoh company). Exact devices only: 04C5 also covers other Fujitsu hardware. fi / SP series download page live 2026-10-28 (browser)"
+    },
+    {
+      "label": "Ricoh (PFU / Fujitsu) ScanSnap scanners",
+      "bus": "USB",
+      "ven": "04C5",
+      "dev": [
+        "10FE",
+        "159F"
+      ],
+      "domain": "ricoh.com",
+      "supportPage": "https://www.pfu.ricoh.com/global/scanners/scansnap/dl/",
+      "versions": [],
+      "optional": [],
+      "lastVerified": "2026-10-28",
+      "evidence": "usb.ids names 04C5:10FE/159F as ScanSnap S500 / iX1500; ScanSnap software download page live 2026-10-28 (browser)"
     }
   ],
-
   "vendorFallbacks": [
-    { "ven": "1AF4", "name": "Red Hat / VirtIO", "domain": "fedoraproject.org", "supportPage": "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/" },
-    { "ven": "15AD", "name": "VMware", "domain": "vmware.com", "supportPage": "https://knowledge.broadcom.com/external/article?legacyId=1014294" },
-    { "ven": "1D6B", "name": "Linux Foundation (USB root)", "domain": "kernel.org", "supportPage": "https://www.kernel.org/" }
+    {
+      "ven": "1AF4",
+      "name": "Red Hat / VirtIO",
+      "domain": "fedorapeople.org",
+      "supportPage": "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/"
+    },
+    {
+      "ven": "15AD",
+      "name": "VMware (Broadcom)",
+      "domain": "broadcom.com",
+      "supportPage": "https://knowledge.broadcom.com/external/article?legacyId=1014294"
+    },
+    {
+      "ven": "1D6B",
+      "name": "Linux Foundation (USB root)",
+      "domain": "kernel.org",
+      "supportPage": "https://www.kernel.org/"
+    }
   ],
-
   "systemVendors": [
-    { "aliases": ["ASUSTeK", "ASUS"], "domain": "asus.com", "supportPage": "https://www.asus.com/support/download-center/" },
-    { "aliases": ["Micro-Star", "MSI"], "domain": "msi.com", "supportPage": "https://www.msi.com/support/download" },
-    { "aliases": ["Gigabyte", "GIGABYTE", "AORUS"], "domain": "gigabyte.com", "supportPage": "https://www.gigabyte.com/Support/Consumer/Download" },
-    { "aliases": ["ASRock"], "domain": "asrock.com", "supportPage": "https://www.asrock.com/support/index.asp?cat=Drivers" },
-    { "aliases": ["Biostar"], "domain": "biostar.com.tw", "supportPage": "https://www.biostar.com.tw/app/en/support/download.php" },
-    { "aliases": ["EVGA"], "domain": "evga.com", "supportPage": "https://www.evga.com/support/download/" },
-    { "aliases": ["Dell", "Alienware"], "domain": "dell.com", "supportPage": "https://www.dell.com/support/home/en-us?app=drivers" },
-    { "aliases": ["HP", "Hewlett-Packard", "HP Inc"], "domain": "hp.com", "supportPage": "https://support.hp.com/us-en/drivers" },
-    { "aliases": ["Lenovo", "LENOVO"], "domain": "lenovo.com", "supportPage": "https://pcsupport.lenovo.com/us/en" },
-    { "aliases": ["Acer", "Gateway", "Predator"], "domain": "acer.com", "supportPage": "https://www.acer.com/us-en/support/drivers-and-manuals" },
-    { "aliases": ["Framework"], "domain": "frame.work", "supportPage": "https://knowledgebase.frame.work/bios-and-drivers-downloads-rJ3PaCexh" },
-    { "aliases": ["Razer"], "domain": "razer.com", "supportPage": "https://mysupport.razer.com/" },
-    { "aliases": ["Microsoft Corporation"], "domain": "microsoft.com", "supportPage": "https://support.microsoft.com/en-us/surface/drivers-firmware/download-drivers-and-firmware-for-surface" },
-    { "aliases": ["SAMSUNG ELECTRONICS", "Samsung"], "domain": "samsung.com", "supportPage": "https://www.samsung.com/us/support/downloads/" },
-    { "aliases": ["LG Electronics", "LGE"], "domain": "lg.com", "supportPage": "https://www.lg.com/us/support" },
-
-    { "aliases": ["CLEVO", "Clevo", "TongFang", "TONGFANG", "Notebook", "Standard"], "domain": "clevo.com.tw", "supportPage": "https://www.clevo.com.tw/en/e-services/download/default.asp" },
-    { "aliases": ["System76"], "domain": "system76.com", "supportPage": "https://system76.com/support/" },
-    { "aliases": ["Eluktronics"], "domain": "eluktronics.com", "supportPage": "https://www.eluktronics.com/driver-downloads" },
-    { "aliases": ["SCHENKER", "Schenker", "XMG"], "domain": "schenker-tech.de", "supportPage": "https://download.schenker-tech.de/" },
-    { "aliases": ["Metabox"], "domain": "metabox.com.au", "supportPage": "https://www.metabox.com.au/drivers.asp" },
-    { "aliases": ["MECHREVO"], "domain": "mechrevo.com", "supportPage": "https://www.mechrevo.com/en/downloads" },
-    { "aliases": ["TUXEDO"], "domain": "tuxedocomputers.com", "supportPage": "https://www.tuxedocomputers.com/en/Downloads-Drivers.tuxedo" },
-    { "aliases": ["Maingear"], "domain": "maingear.com", "supportPage": "https://help.maingear.com/category/71-drivers" },
-    { "aliases": ["Origin PC"], "domain": "originpc.com", "supportPage": "https://support.originpc.com/" },
-    { "aliases": ["MEDION"], "domain": "medion.com", "supportPage": "https://www.medion.com/downloads/" },
-    { "aliases": ["Dynabook", "TOSHIBA"], "domain": "dynabook.com", "supportPage": "https://support.dynabook.com/drivers" },
-    { "aliases": ["VAIO", "Sony Corporation"], "domain": "vaio.com", "supportPage": "https://us.vaio.com/pages/support" },
-    { "aliases": ["HUAWEI"], "domain": "huawei.com", "supportPage": "https://consumer.huawei.com/en/support/driver-list/" },
-    { "aliases": ["FUJITSU"], "domain": "fujitsu.com", "supportPage": "https://global.fujitsu/en-us/support" },
-    { "aliases": ["Panasonic"], "domain": "panasonic.com", "supportPage": "https://global-pc-support.connect.panasonic.com/driver" },
-    { "aliases": ["Getac"], "domain": "getac.com", "supportPage": "https://us.getac.com/page-support/drivers2" },
-    { "aliases": ["Durabook", "TWINHEAD"], "domain": "durabook.com", "supportPage": "https://www.durabook.com/en/support/downloads/" }
+    {
+      "aliases": [
+        "ASUSTeK",
+        "ASUS"
+      ],
+      "domain": "asus.com",
+      "supportPage": "https://www.asus.com/support/download-center/"
+    },
+    {
+      "aliases": [
+        "Micro-Star",
+        "MSI"
+      ],
+      "domain": "msi.com",
+      "supportPage": "https://www.msi.com/support/download"
+    },
+    {
+      "aliases": [
+        "Gigabyte",
+        "GIGABYTE",
+        "AORUS"
+      ],
+      "domain": "gigabyte.com",
+      "supportPage": "https://www.gigabyte.com/Support/Consumer/Download"
+    },
+    {
+      "aliases": [
+        "ASRock"
+      ],
+      "domain": "asrock.com",
+      "supportPage": "https://www.asrock.com/support/index.asp?cat=Drivers"
+    },
+    {
+      "aliases": [
+        "Biostar"
+      ],
+      "domain": "biostar.com.tw",
+      "supportPage": "https://www.biostar.com.tw/app/en/support/download.php"
+    },
+    {
+      "aliases": [
+        "EVGA"
+      ],
+      "domain": "evga.com",
+      "supportPage": "https://www.evga.com/support/download/"
+    },
+    {
+      "aliases": [
+        "Dell",
+        "Alienware"
+      ],
+      "domain": "dell.com",
+      "supportPage": "https://www.dell.com/support/home/en-us?app=drivers"
+    },
+    {
+      "aliases": [
+        "HP",
+        "Hewlett-Packard",
+        "HP Inc"
+      ],
+      "domain": "hp.com",
+      "supportPage": "https://support.hp.com/us-en/drivers"
+    },
+    {
+      "aliases": [
+        "Lenovo",
+        "LENOVO"
+      ],
+      "domain": "lenovo.com",
+      "supportPage": "https://pcsupport.lenovo.com/us/en"
+    },
+    {
+      "aliases": [
+        "Acer",
+        "Gateway",
+        "Predator"
+      ],
+      "domain": "acer.com",
+      "supportPage": "https://www.acer.com/us-en/support/drivers-and-manuals"
+    },
+    {
+      "aliases": [
+        "Framework"
+      ],
+      "domain": "frame.work",
+      "supportPage": "https://knowledgebase.frame.work/bios-and-drivers-downloads-rJ3PaCexh"
+    },
+    {
+      "aliases": [
+        "Razer"
+      ],
+      "domain": "razer.com",
+      "supportPage": "https://mysupport.razer.com/"
+    },
+    {
+      "aliases": [
+        "Microsoft Corporation"
+      ],
+      "domain": "microsoft.com",
+      "supportPage": "https://support.microsoft.com/en-us/surface/drivers-firmware/download-drivers-and-firmware-for-surface"
+    },
+    {
+      "aliases": [
+        "SAMSUNG ELECTRONICS",
+        "Samsung"
+      ],
+      "domain": "samsung.com",
+      "supportPage": "https://www.samsung.com/us/support/downloads/"
+    },
+    {
+      "aliases": [
+        "LG Electronics",
+        "LGE"
+      ],
+      "domain": "lg.com",
+      "supportPage": "https://www.lg.com/us/support"
+    },
+    {
+      "aliases": [
+        "CLEVO",
+        "Clevo",
+        "TongFang",
+        "TONGFANG",
+        "Notebook",
+        "Standard"
+      ],
+      "domain": "clevo.com.tw",
+      "supportPage": "https://www.clevo.com.tw/load_page/service_download"
+    },
+    {
+      "aliases": [
+        "System76"
+      ],
+      "domain": "system76.com",
+      "supportPage": "https://system76.com/support/"
+    },
+    {
+      "aliases": [
+        "Eluktronics"
+      ],
+      "domain": "eluktronics.com",
+      "supportPage": "https://www.eluktronics.com/driver-downloads"
+    },
+    {
+      "aliases": [
+        "SCHENKER",
+        "Schenker",
+        "XMG"
+      ],
+      "domain": "schenker-tech.de",
+      "supportPage": "https://download.schenker-tech.de/"
+    },
+    {
+      "aliases": [
+        "Metabox"
+      ],
+      "domain": "metabox.com.au",
+      "supportPage": "https://www.metabox.com.au/drivers.asp"
+    },
+    {
+      "aliases": [
+        "MECHREVO"
+      ],
+      "domain": "mechrevo.com",
+      "supportPage": "https://www.mechrevo.com/en/downloads"
+    },
+    {
+      "aliases": [
+        "TUXEDO"
+      ],
+      "domain": "tuxedocomputers.com",
+      "supportPage": "https://www.tuxedocomputers.com/en/Downloads-Drivers.tuxedo"
+    },
+    {
+      "aliases": [
+        "Maingear"
+      ],
+      "domain": "maingear.com",
+      "supportPage": "https://help.maingear.com/category/71-drivers"
+    },
+    {
+      "aliases": [
+        "Origin PC"
+      ],
+      "domain": "originpc.com",
+      "supportPage": "https://support.originpc.com/"
+    },
+    {
+      "aliases": [
+        "MEDION"
+      ],
+      "domain": "medion.com",
+      "supportPage": "https://www.medion.com/downloads/"
+    },
+    {
+      "aliases": [
+        "Dynabook",
+        "TOSHIBA"
+      ],
+      "domain": "dynabook.com",
+      "supportPage": "https://support.dynabook.com/drivers"
+    },
+    {
+      "aliases": [
+        "VAIO",
+        "Sony Corporation"
+      ],
+      "domain": "vaio.com",
+      "supportPage": "https://us.vaio.com/pages/support"
+    },
+    {
+      "aliases": [
+        "HUAWEI"
+      ],
+      "domain": "huawei.com",
+      "supportPage": "https://consumer.huawei.com/en/support/driver-list/"
+    },
+    {
+      "aliases": [
+        "FUJITSU"
+      ],
+      "domain": "global.fujitsu",
+      "supportPage": "https://global.fujitsu/en-us/support"
+    },
+    {
+      "aliases": [
+        "Panasonic"
+      ],
+      "domain": "panasonic.com",
+      "supportPage": "https://global-pc-support.connect.panasonic.com/driver"
+    },
+    {
+      "aliases": [
+        "Getac"
+      ],
+      "domain": "getac.com",
+      "supportPage": "https://us.getac.com/page-support/drivers2"
+    },
+    {
+      "aliases": [
+        "Durabook",
+        "TWINHEAD"
+      ],
+      "domain": "durabook.com",
+      "supportPage": "https://www.durabook.com/en/support/downloads/"
+    },
+    {
+      "aliases": [
+        "Micro Computer (HK) Tech",
+        "MINISFORUM"
+      ],
+      "domain": "minisforum.com",
+      "supportPage": "https://www.minisforum.com/pages/product-info",
+      "evidence": "Minisforum PCs report 'Micro Computer (HK) Tech Limited' (50 probes on linux-hardware.org, the Venus series); Drivers & Downloads page live 2026-10-28 (browser)"
+    },
+    {
+      "aliases": [
+        "AZW"
+      ],
+      "domain": "bee-link.cn",
+      "supportPage": "https://dr.bee-link.cn/",
+      "evidence": "Beelink PCs report 'AZW' (Shenzhen AZW Technology, 1109 probes on linux-hardware.org); the Download Center is linked from bee-link.com and was live 2026-10-28 (browser)"
+    },
+    {
+      "aliases": [
+        "CHUWI"
+      ],
+      "domain": "chuwi.com",
+      "supportPage": "https://support.chuwi.com/",
+      "evidence": "CHUWI devices report 'CHUWI...' (587 probes on linux-hardware.org); support centre (software, drivers, OS images) live 2026-10-28 (browser)"
+    },
+    {
+      "aliases": [
+        "Supermicro"
+      ],
+      "domain": "supermicro.com",
+      "supportPage": "https://www.supermicro.com/en/support/resources/downloadcenter/swdownload",
+      "evidence": "Supermicro systems and boards report 'Supermicro' (1481 probes on linux-hardware.org); download centre live 2026-10-28 (browser, the site blocks scripts)"
+    },
+    {
+      "aliases": [
+        "Valve"
+      ],
+      "domain": "steampowered.com",
+      "supportPage": "https://help.steampowered.com/en/faqs/view/6121-ECCD-D643-BAA8",
+      "evidence": "Steam Deck reports 'Valve' (2197 probes on linux-hardware.org); Valve's Steam Hardware Windows Resources page (Windows drivers) live 2026-10-28 (checked by script)"
+    },
+    {
+      "aliases": [
+        "AYANEO"
+      ],
+      "domain": "ayaneo.com",
+      "supportPage": "https://www.ayaneo.com/support/download",
+      "evidence": "AYANEO handhelds report 'AYANEO' (41 probes on linux-hardware.org); download page live 2026-10-28 (browser)"
+    }
+  ],
+  "oemParts": [
+    {
+      "bus": "HDAUDIO",
+      "ven": "10EC",
+      "maker": "Realtek",
+      "note": "Audio codec: the PC maker ships the tuned driver"
+    },
+    {
+      "bus": "INTELAUDIO",
+      "ven": "10EC",
+      "maker": "Realtek",
+      "note": "Audio codec on Intel Smart Sound: the PC maker ships the tuned driver"
+    },
+    {
+      "bus": "HDAUDIO",
+      "ven": "14F1",
+      "maker": "Conexant (Synaptics)",
+      "note": "Audio codec"
+    },
+    {
+      "bus": "HDAUDIO",
+      "ven": "1013",
+      "maker": "Cirrus Logic",
+      "note": "Audio codec"
+    },
+    {
+      "bus": "HDAUDIO",
+      "ven": "111D",
+      "maker": "IDT (Tempo)",
+      "note": "Audio codec"
+    },
+    {
+      "bus": "HDAUDIO",
+      "ven": "1106",
+      "maker": "VIA",
+      "note": "Audio codec"
+    },
+    {
+      "bus": "INTELAUDIO",
+      "ven": "8086",
+      "maker": "Intel",
+      "note": "Intel Smart Sound audio DSP: supplied by the PC maker"
+    },
+    {
+      "bus": "PCI",
+      "ven": "14C3",
+      "maker": "MediaTek",
+      "note": "Wi-Fi / Bluetooth: MediaTek directs users to the device maker"
+    },
+    {
+      "bus": "USB",
+      "ven": "0E8D",
+      "maker": "MediaTek",
+      "note": "Bluetooth / Wi-Fi"
+    },
+    {
+      "bus": "USB",
+      "ven": "0CF3",
+      "maker": "Qualcomm Atheros",
+      "note": "Bluetooth"
+    },
+    {
+      "bus": "USB",
+      "ven": "0A5C",
+      "maker": "Broadcom",
+      "note": "Bluetooth"
+    },
+    {
+      "bus": "USB",
+      "ven": "13D3",
+      "maker": "AzureWave (IMC Networks)",
+      "note": "Bluetooth / Wi-Fi module or webcam"
+    },
+    {
+      "bus": "USB",
+      "ven": "04CA",
+      "maker": "Lite-On",
+      "note": "Bluetooth module or webcam"
+    },
+    {
+      "bus": "USB",
+      "ven": "0489",
+      "maker": "Foxconn",
+      "note": "Bluetooth module"
+    },
+    {
+      "bus": "USB",
+      "ven": "04F2",
+      "maker": "Chicony",
+      "note": "Built-in webcam"
+    },
+    {
+      "bus": "USB",
+      "ven": "1BCF",
+      "maker": "Sunplus",
+      "note": "Built-in webcam"
+    },
+    {
+      "bus": "USB",
+      "ven": "5986",
+      "maker": "Bison",
+      "note": "Built-in webcam"
+    },
+    {
+      "bus": "USB",
+      "ven": "27C6",
+      "maker": "Goodix",
+      "note": "Fingerprint reader"
+    },
+    {
+      "bus": "USB",
+      "ven": "1C7A",
+      "maker": "Egis (LighTuning)",
+      "note": "Fingerprint reader"
+    },
+    {
+      "bus": "USB",
+      "ven": "06CB",
+      "maker": "Synaptics",
+      "note": "Touchpad / fingerprint reader"
+    },
+    {
+      "bus": "USB",
+      "ven": "04F3",
+      "maker": "ELAN",
+      "note": "Touchpad / touchscreen / fingerprint reader"
+    },
+    {
+      "bus": "PCI",
+      "ven": "1969",
+      "maker": "Qualcomm Atheros (Ethernet)",
+      "note": "Laptop/board Ethernet chip without a public driver page (Killer models are matched separately)"
+    },
+    {
+      "bus": "PCI",
+      "ven": "11AB",
+      "maker": "Marvell",
+      "note": "Legacy Yukon Ethernet / SATA / Avastar chip: the PC maker ships the driver"
+    },
+    {
+      "bus": "PCI",
+      "ven": "1B21",
+      "maker": "ASMedia",
+      "note": "SATA / USB controller on the motherboard: the board or PC maker ships the driver"
+    },
+    {
+      "bus": "PCI",
+      "ven": "197B",
+      "maker": "JMicron",
+      "note": "SATA / card-reader controller on the motherboard: the board or PC maker ships the driver"
+    }
+  ],
+  "genericIds": [
+    {
+      "bus": "USB",
+      "ven": "0483",
+      "note": "STMicroelectronics microcontrollers (used by countless brands)"
+    },
+    {
+      "bus": "USB",
+      "ven": "04D8",
+      "note": "Microchip microcontrollers"
+    },
+    {
+      "bus": "USB",
+      "ven": "2341",
+      "note": "Arduino boards"
+    },
+    {
+      "bus": "USB",
+      "ven": "04D9",
+      "note": "Holtek keyboard/mouse controllers"
+    },
+    {
+      "bus": "USB",
+      "ven": "093A",
+      "note": "PixArt mouse sensors / controllers"
+    },
+    {
+      "bus": "USB",
+      "ven": "25A7",
+      "note": "Compx (Areson) receivers"
+    },
+    {
+      "bus": "USB",
+      "ven": "0416",
+      "note": "Winbond / Nuvoton controllers"
+    },
+    {
+      "bus": "USB",
+      "ven": "04B4",
+      "note": "Cypress (Infineon) controllers"
+    },
+    {
+      "bus": "USB",
+      "ven": "0A12",
+      "note": "Cambridge Silicon Radio generic Bluetooth dongles"
+    },
+    {
+      "bus": "USB",
+      "ven": "1A2C",
+      "note": "China Resource Semico keyboard controllers"
+    },
+    {
+      "bus": "USB",
+      "ven": "174C",
+      "note": "ASMedia USB-to-SATA/NVMe bridges inside countless drive enclosures (Windows' own driver)"
+    },
+    {
+      "bus": "USB",
+      "ven": "152D",
+      "note": "JMicron USB-to-SATA/NVMe bridges inside countless drive enclosures (Windows' own driver)"
+    },
+    {
+      "bus": "USB",
+      "ven": "0D8C",
+      "note": "C-Media USB audio chips inside countless headsets and sound cards (Windows' own driver)"
+    },
+    {
+      "bus": "USB",
+      "ven": "05E3",
+      "note": "Genesys Logic USB hubs and card readers inside countless docks, monitors and enclosures (Windows' own driver)"
+    },
+    {
+      "bus": "USB",
+      "ven": "058F",
+      "note": "Alcor Micro card readers and flash controllers used by many brands"
+    },
+    {
+      "bus": "USB",
+      "ven": "0C45",
+      "note": "Microdia (SONiX) webcam and keyboard controllers used by countless brands"
+    },
+    {
+      "bus": "USB",
+      "ven": "1209",
+      "note": "pid.codes: a shared vendor ID for open-source hardware projects"
+    },
+    {
+      "bus": "USB",
+      "ven": "16C0",
+      "note": "Van Ooijen (V-USB): a shared vendor ID for hobby and open-hardware devices"
+    },
+    {
+      "bus": "USB",
+      "ven": "1D50",
+      "note": "OpenMoko: a shared vendor ID for open-hardware projects"
+    },
+    {
+      "bus": "USB",
+      "ven": "0079",
+      "note": "DragonRise generic gamepad controllers sold under many names"
+    },
+    {
+      "bus": "USB",
+      "ven": "2563",
+      "note": "ShanWan generic gamepad controllers sold under many names"
+    }
+  ],
+  "partnerTools": [
+    {
+      "maker": "ASUS",
+      "bus": "PCI",
+      "vens": [
+        "10DE"
+      ],
+      "pnpClass": "Display",
+      "subsys": [
+        "1043"
+      ],
+      "domain": "asus.com",
+      "tools": [
+        {
+          "name": "ASUS GPU Tweak III",
+          "note": "Tuning, fan and lighting control for ASUS graphics cards",
+          "url": "https://www.asus.com/campaign/GPU-Tweak-III/"
+        }
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "SUBSYS 1043 = ASUSTeK in pci.ids; NVIDIA only, since ASUS boards also carry 1043 on their integrated AMD/Intel graphics. GPU Tweak III page live 2026-10-28 (browser)"
+    },
+    {
+      "maker": "MSI",
+      "bus": "PCI",
+      "vens": [
+        "10DE"
+      ],
+      "pnpClass": "Display",
+      "subsys": [
+        "1462"
+      ],
+      "domain": "msi.com",
+      "tools": [
+        {
+          "name": "MSI Afterburner",
+          "note": "MSI's graphics card tuning and monitoring tool",
+          "url": "https://www.msi.com/Landing/afterburner/graphics-cards"
+        }
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "SUBSYS 1462 = Micro-Star International in pci.ids; NVIDIA only (MSI boards carry 1462 on integrated graphics). Afterburner page live 2026-10-28 (browser, the site blocks scripts)"
+    },
+    {
+      "maker": "GIGABYTE",
+      "bus": "PCI",
+      "vens": [
+        "10DE"
+      ],
+      "pnpClass": "Display",
+      "subsys": [
+        "1458"
+      ],
+      "domain": "gigabyte.com",
+      "tools": [
+        {
+          "name": "GIGABYTE Control Center",
+          "note": "GIGABYTE / AORUS graphics card tuning and RGB control",
+          "url": "https://www.gigabyte.com/Consumer/Software/GIGABYTE-Control-Center/global"
+        }
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "SUBSYS 1458 = Gigabyte Technology in pci.ids; NVIDIA only (GIGABYTE boards carry 1458 on integrated graphics). Control Center page live 2026-10-28 (browser, the site blocks scripts)"
+    },
+    {
+      "maker": "EVGA",
+      "bus": "PCI",
+      "vens": [
+        "10DE"
+      ],
+      "pnpClass": "Display",
+      "subsys": [
+        "3842"
+      ],
+      "domain": "evga.com",
+      "tools": [
+        {
+          "name": "EVGA Precision X1",
+          "note": "Tuning and monitoring for EVGA GeForce cards",
+          "url": "https://www.evga.com/precisionx1/"
+        }
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "SUBSYS 3842 = EVGA Corporation in pci.ids; Precision X1 page live 2026-10-28 (checked by script)"
+    },
+    {
+      "maker": "Palit",
+      "bus": "PCI",
+      "vens": [
+        "10DE"
+      ],
+      "pnpClass": "Display",
+      "subsys": [
+        "1569"
+      ],
+      "domain": "palit.com",
+      "tools": [
+        {
+          "name": "Palit ThunderMaster",
+          "note": "Tuning and lighting control for Palit GeForce cards",
+          "url": "https://www.palit.com/thundermaster/index.php?lang=en"
+        }
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "SUBSYS 1569 = Palit Microsystems in pci.ids; ThunderMaster page live 2026-10-28 (checked by script)"
+    },
+    {
+      "maker": "PNY",
+      "bus": "PCI",
+      "vens": [
+        "10DE"
+      ],
+      "pnpClass": "Display",
+      "subsys": [
+        "196E"
+      ],
+      "domain": "pny.com",
+      "tools": [
+        {
+          "name": "PNY VelocityX",
+          "note": "Overclocking and lighting software for PNY GeForce cards",
+          "url": "https://www.pny.com/gaming/learn-more/velocityx"
+        }
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "SUBSYS 196E = PNY in pci.ids; VelocityX page live 2026-10-28 (browser)"
+    },
+    {
+      "maker": "GALAX / KFA2",
+      "bus": "PCI",
+      "vens": [
+        "10DE"
+      ],
+      "pnpClass": "Display",
+      "subsys": [
+        "1B4C"
+      ],
+      "domain": "galax.com",
+      "tools": [
+        {
+          "name": "GALAX Xtreme Tuner",
+          "note": "Tuning and monitoring for GALAX / KFA2 GeForce cards",
+          "url": "https://galax.com/en/software/xtreme-tuner-app/"
+        }
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "SUBSYS 1B4C = GALAX in pci.ids; Xtreme Tuner page live 2026-10-28 (browser)"
+    },
+    {
+      "maker": "Sapphire",
+      "bus": "PCI",
+      "vens": [
+        "1002"
+      ],
+      "pnpClass": "Display",
+      "subsys": [
+        "1DA2"
+      ],
+      "domain": "sapphiretech.com",
+      "tools": [
+        {
+          "name": "SAPPHIRE TriXX",
+          "note": "Tuning and monitoring for Sapphire Radeon cards",
+          "url": "https://www.sapphiretech.com/en/software"
+        }
+      ],
+      "lastVerified": "2026-10-28",
+      "evidence": "SUBSYS 1DA2 = Sapphire Technology in pci.ids (174B is left out: PC Partner builds for several brands); TriXX page live 2026-10-28 (checked by script)"
+    }
   ]
 }

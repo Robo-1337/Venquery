@@ -23,6 +23,8 @@ public static partial class HardwareScanner
     {
         "Display", "Net", "Media", "System", "USB", "HIDClass", "Mouse", "Keyboard",
         "SCSIAdapter", "HDC", "Bluetooth", "Image", "Camera",
+        // Printers / scanners (their USB device) and USB-serial adapters (FTDI, Silicon Labs, Prolific, WCH).
+        "Printer", "Ports",
     };
 
     // Generic, class-supplied device names that shouldn't win over a more specific
@@ -39,12 +41,33 @@ public static partial class HardwareScanner
 
     // net8 uses the [GeneratedRegex] source generator; the Legacy (net48) build uses a compiled Regex.
 #if LEGACY
-    private static readonly Regex _hardwareIdPattern = new(@"^(PCI|USB|HDAUDIO)\\(?:FUNC_[0-9A-Fa-f]{2}&)?(?:VEN|VID)_([0-9A-Fa-f]{4})&(?:DEV|PID)_([0-9A-Fa-f]{4})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex _hardwareIdPattern = new(@"^(PCI|USB|HDAUDIO|INTELAUDIO)\\(?:[A-Za-z0-9_]+&)*?(?:VEN|VID)_([0-9A-Fa-f]{4})&(?:DEV|PID)_([0-9A-Fa-f]{4})(?:&SUBSYS_([0-9A-Fa-f]{8}))?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static Regex HardwareIdPattern() => _hardwareIdPattern;
 #else
-    [GeneratedRegex(@"^(PCI|USB|HDAUDIO)\\(?:FUNC_[0-9A-Fa-f]{2}&)?(?:VEN|VID)_([0-9A-Fa-f]{4})&(?:DEV|PID)_([0-9A-Fa-f]{4})", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"^(PCI|USB|HDAUDIO|INTELAUDIO)\\(?:[A-Za-z0-9_]+&)*?(?:VEN|VID)_([0-9A-Fa-f]{4})&(?:DEV|PID)_([0-9A-Fa-f]{4})(?:&SUBSYS_([0-9A-Fa-f]{8}))?", RegexOptions.IgnoreCase)]
     private static partial Regex HardwareIdPattern();
 #endif
+
+    /// <summary>Read bus, vendor, device and the subsystem (board/OEM) vendor + device out of a hardware ID such as
+    /// <c>PCI\VEN_10DE&amp;DEV_1C8D&amp;SUBSYS_118B1025</c>, <c>INTELAUDIO\FUNC_01&amp;VEN_10EC&amp;DEV_0255&amp;SUBSYS_1025118A</c>
+    /// or <c>INTELAUDIO\DSP_CTLR_DEV_A171&amp;VEN_8086&amp;DEV_0222</c>. Null when it isn't a PCI/USB/audio ID.
+    /// PCI writes SUBSYS as device+vendor; the HD audio buses write it as vendor+device.</summary>
+    public static (string Bus, string Ven, string Dev, string SubVen, string SubDev)? ParseHardwareId(string raw)
+    {
+        if (string.IsNullOrEmpty(raw)) return null;
+        var m = HardwareIdPattern().Match(raw);
+        if (!m.Success) return null;
+        var bus = m.Groups[1].Value.ToUpperInvariant();
+        string subVen = "", subDev = "";
+        if (m.Groups[4].Success)
+        {
+            var sub = m.Groups[4].Value.ToUpperInvariant();
+            if (bus == "PCI") { subVen = sub.Substring(4, 4); subDev = sub.Substring(0, 4); }
+            else { subVen = sub.Substring(0, 4); subDev = sub.Substring(4, 4); }
+            if (subVen == "0000") { subVen = ""; subDev = ""; }
+        }
+        return (bus, m.Groups[2].Value.ToUpperInvariant(), m.Groups[3].Value.ToUpperInvariant(), subVen, subDev);
+    }
 
     public static Task<List<ScannedDevice>> ScanAsync(IProgress<string>? log = null)
         => Task.Run(() => Scan(log));
@@ -256,19 +279,17 @@ public static partial class HardwareScanner
             foreach (ManagementObject mo in searcher.Get())
             {
                 var pnpClass = mo["PNPClass"] as string ?? "";
-                if (!InterestingClasses.Contains(pnpClass)) continue;
+                // Canonical spelling (Intel's audio stack reports "MEDIA"), so case-sensitive checks downstream agree.
+                if (!InterestingClasses.TryGetValue(pnpClass, out var canonicalClass)) continue;
+                pnpClass = canonicalClass;
 
                 var hwids = mo["HardwareID"] as string[];
                 if (hwids is null || hwids.Length == 0) continue;
 
                 // The first hardware ID is the most specific.
                 var raw = hwids[0];
-                var m = HardwareIdPattern().Match(raw);
-                if (!m.Success) continue;
-
-                var bus = m.Groups[1].Value.ToUpperInvariant();
-                var ven = m.Groups[2].Value.ToUpperInvariant();
-                var dev = m.Groups[3].Value.ToUpperInvariant();
+                if (ParseHardwareId(raw) is not { } id) continue;
+                var (bus, ven, dev, subVen, subDev) = id;
 
                 var deviceId = mo["DeviceID"] as string ?? "";
                 var (ver, date) = driverByDeviceId.TryGetValue(deviceId, out var d) ? d : ("", "");
@@ -298,6 +319,8 @@ public static partial class HardwareScanner
                     Bus = bus,
                     Vendor = ven,
                     Device = dev,
+                    SubsysVendor = subVen,
+                    SubsysDevice = subDev,
                     InstalledVersion = ver,
                     InstalledDate = date,
                 };

@@ -15,9 +15,13 @@ public sealed class ScannedDevice
     public string PnpClass { get; set; } = "";
     public string DeviceId { get; init; } = "";
     public string RawHardwareId { get; init; } = "";
-    public string Bus { get; init; } = "";        // PCI | USB | HDAUDIO | ...
+    public string Bus { get; init; } = "";        // PCI | USB | HDAUDIO | INTELAUDIO | ...
     public string Vendor { get; init; } = "";     // 4-hex VEN / VID
     public string Device { get; init; } = "";     // 4-hex DEV / PID
+    // The board/OEM that built the part around the chip, from SUBSYS_ (PCI and audio buses only; "" when absent).
+    // e.g. an NVIDIA GPU in an Acer laptop: Vendor 10DE, SubsysVendor 1025.
+    public string SubsysVendor { get; init; } = "";
+    public string SubsysDevice { get; init; } = "";
     public string InstalledVersion { get; set; } = "";
     public string InstalledDate { get; set; } = "";
 }
@@ -34,15 +38,47 @@ public sealed class Manifest
     [JsonPropertyName("devices")] public List<Definition> Devices { get; set; } = new();
     [JsonPropertyName("vendorFallbacks")] public List<VendorFallback> VendorFallbacks { get; set; } = new();
     [JsonPropertyName("systemVendors")] public List<SystemVendor> SystemVendors { get; set; } = new();
+    // Chip/ODM makers that don't publish drivers for the public (a laptop's Chicony webcam, a codec). On an OEM
+    // PC their parts are routed to the PC maker's support page, never branded with the chip maker.
+    [JsonPropertyName("oemParts")] public List<OemPart> OemParts { get; set; } = new();
+    // Generic chip vendor IDs shared by countless unrelated brands (STMicro, Microchip, Holtek...). Never matched,
+    // so a gadget built on one can't be shown under a wrong brand.
+    [JsonPropertyName("genericIds")] public List<GenericId> GenericIds { get; set; } = new();
+    // Board partners' own tools (ASUS GPU Tweak, MSI Afterburner...) found by the card's SUBSYS vendor. They are only
+    // ADDED to the row's optional software: the driver entry (NVIDIA / AMD) still comes from the normal match.
+    [JsonPropertyName("partnerTools")] public List<PartnerTool> PartnerTools { get; set; } = new();
+}
+
+/// <summary>Optional software from the company that built a card around a GPU chip (see <see cref="Manifest.PartnerTools"/>).</summary>
+public sealed class PartnerTool
+{
+    [JsonPropertyName("maker")] public string Maker { get; set; } = "";
+    [JsonPropertyName("bus")] public string Bus { get; set; } = "PCI";
+    [JsonPropertyName("vens")] public List<string> Vens { get; set; } = new();       // the chip vendors it applies to
+    [JsonPropertyName("pnpClass")] public string? PnpClass { get; set; }
+    [JsonPropertyName("subsys")] public List<string> Subsys { get; set; } = new();   // the partner's SUBSYS vendor IDs
+    [JsonPropertyName("domain")] public string Domain { get; set; } = "";
+    [JsonPropertyName("tools")] public List<OptionalTool> Tools { get; set; } = new();
+    [JsonPropertyName("lastVerified")] public string? LastVerified { get; set; }
+    [JsonPropertyName("evidence")] public string? Evidence { get; set; }
 }
 
 public sealed class Definition
 {
     [JsonPropertyName("label")] public string Label { get; set; } = "";
     [JsonPropertyName("bus")] public string Bus { get; set; } = "PCI";
+    // Optional: several buses for one vendor entry (audio chips appear on HDAUDIO and INTELAUDIO). Replaces Bus.
+    [JsonPropertyName("buses")] public List<string>? Buses { get; set; }
     [JsonPropertyName("ven")] public string Ven { get; set; } = "";
     [JsonPropertyName("dev")] public List<string>? Dev { get; set; }          // null => any device from vendor
     [JsonPropertyName("pnpClass")] public string? PnpClass { get; set; }      // optional extra filter, e.g. "Display"
+    // Optional: only match parts whose SUBSYS vendor is one of these (shared controller IDs such as Phison).
+    [JsonPropertyName("subsys")] public List<string>? Subsys { get; set; }
+    // Bookkeeping for the curated database: when the IDs + URLs were last checked, and against what.
+    [JsonPropertyName("lastVerified")] public string? LastVerified { get; set; }
+    [JsonPropertyName("evidence")] public string? Evidence { get; set; }
+    // Other hosts that belong to this vendor (its download CDN or short-link service), e.g. Razer's dl.razerzone.com.
+    [JsonPropertyName("cdnHosts")] public List<string>? CdnHosts { get; set; }
     [JsonPropertyName("domain")] public string Domain { get; set; } = "";
     [JsonPropertyName("supportPage")] public string SupportPage { get; set; } = "";
     [JsonPropertyName("referer")] public string? Referer { get; set; }        // some vendors (AMD) require it
@@ -56,6 +92,28 @@ public sealed class Definition
     // "directDownload" is a vendor-maintained "always latest" installer URL: the URL
     // itself never changes but the vendor keeps it pointed at the newest build.
     [JsonPropertyName("directDownload")] public DirectDownload? DirectDownload { get; set; }
+
+    /// <summary>The buses this entry applies to: <see cref="Buses"/> when set, otherwise <see cref="Bus"/>.</summary>
+    public IEnumerable<string> EffectiveBuses => Buses is { Count: > 0 } ? Buses : new[] { Bus };
+
+    public bool OnBus(string bus) => EffectiveBuses.Any(b => string.Equals(b, bus, StringComparison.OrdinalIgnoreCase));
+}
+
+/// <summary>A chip/ODM maker whose parts get their drivers from the PC maker (see <see cref="Manifest.OemParts"/>).</summary>
+public sealed class OemPart
+{
+    [JsonPropertyName("bus")] public string Bus { get; set; } = "USB";
+    [JsonPropertyName("ven")] public string Ven { get; set; } = "";
+    [JsonPropertyName("maker")] public string Maker { get; set; } = "";
+    [JsonPropertyName("note")] public string Note { get; set; } = "";
+}
+
+/// <summary>A generic, widely shared chip vendor ID that must never be matched (see <see cref="Manifest.GenericIds"/>).</summary>
+public sealed class GenericId
+{
+    [JsonPropertyName("bus")] public string Bus { get; set; } = "USB";
+    [JsonPropertyName("ven")] public string Ven { get; set; } = "";
+    [JsonPropertyName("note")] public string Note { get; set; } = "";
 }
 
 /// <summary>A stable, vendor-maintained "always latest" direct installer URL.</summary>
@@ -72,6 +130,9 @@ public sealed class VendorFallback
     [JsonPropertyName("name")] public string Name { get; set; } = "";
     [JsonPropertyName("domain")] public string Domain { get; set; } = "";
     [JsonPropertyName("supportPage")] public string SupportPage { get; set; } = "";
+    // Set (never from JSON) when this row is a part routed to the PC maker: who made the chip.
+    [JsonIgnore] public string OemChipMaker { get; set; } = "";
+    [JsonIgnore] public bool IsOemRoute => OemChipMaker.Length > 0;
 }
 
 /// <summary>
@@ -262,7 +323,7 @@ public sealed class DeviceRow : INotifyPropertyChanged
 
     // --- WinUI master/detail helpers ---
     public bool HasVerifiedSource => !string.IsNullOrEmpty(Domain);
-    public string VerifiedText => "Verified: " + Domain;
+    public string VerifiedText => Fallback?.IsOemRoute == true ? "From your PC maker: " + Domain : "Verified: " + Domain;
     public bool HasUpdateDot => StatusKind == "update";
     public bool NoDirectDownload => !HasDirectUrl;
     public string ListSubtitle => StatusKind switch
@@ -371,6 +432,7 @@ public sealed class DeviceRow : INotifyPropertyChanged
 
     public string StatusText => StatusKind switch
     {
+        "none" when Fallback?.IsOemRoute == true => "Get this driver from your PC maker's support page",
         "none" => "No definition, use vendor support page",
         "page" => "Browse official page for downloads",
         "available" => "◆ Latest driver available to download",

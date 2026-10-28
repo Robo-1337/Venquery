@@ -38,6 +38,30 @@ No kernel drivers, no bundled third-party utilities, no background service, noth
 close the app. Windows tools are always started by their full path (for example
 `C:\Windows\System32\pnputil.exe`), so a look-alike file sitting next to Venquery can't be run instead.
 
+## How a device is identified
+
+Windows gives every device hardware IDs (for example `PCI\VEN_10DE&DEV_2684&SUBSYS_88D51043`). Venquery reads
+the vendor and device IDs on the PCI, USB, HD Audio and Intel Smart Sound buses, plus the subsystem ID: the
+company that built the board around the chip. Then it looks them up in `Venquery/definitions.json`:
+
+- **The most specific entry wins:** an exact device beats a board/subsystem entry, which beats a device-type
+  entry, which beats a whole vendor. The order of entries in the file doesn't matter.
+- **Shared vendor IDs only match listed models.** Some companies' IDs cover very different products (a phone
+  and a portable SSD, or several brands' SSDs on one controller maker's ID), so those entries list exact
+  device IDs.
+- **Never-claim list.** Generic chip IDs used by countless unrelated products (USB hub and card-reader chips,
+  microcontrollers, open-hardware IDs, generic gamepads) are never matched.
+- **Your PC maker's parts.** Some chip companies don't publish drivers for the public; the laptop or PC maker
+  ships them. Those parts point to your PC maker's support page and are never shown under the chip maker's name.
+  On a self-built PC this only applies to parts on the motherboard.
+- **Graphics card makers' tools.** When a card's subsystem ID belongs to a board partner, that partner's tuning
+  tool is added as optional software. The driver entry (NVIDIA, AMD) doesn't change. Laptops are skipped, since
+  their subsystem ID is the laptop maker's.
+
+Every entry records when it was last checked and how: the vendor ID against the public PCI and USB ID
+registries, and the page by opening it. Tests (`DefinitionsDatabaseTests`, `DefinitionMatchingTests`) refuse
+conflicting entries, non-HTTPS links, links off the vendor's own site, claimed generic IDs and undated entries.
+
 ## Network use
 
 Venquery has no telemetry, analytics, crash reporting or update pings. It talks to the internet in exactly
