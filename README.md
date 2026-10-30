@@ -5,7 +5,7 @@
 <h1 align="center">Venquery</h1>
 
 <p align="center">
-  <b>Drivers, backups, files and PC health for Windows, in one calm little app.</b><br>
+  <b>Drivers, backups, files and PC health for Windows, in one compact app.</b><br>
   Built only on Windows' own tools. Nothing installs, runs or moves without you saying so.
 </p>
 
